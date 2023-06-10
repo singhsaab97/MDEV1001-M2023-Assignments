@@ -40,6 +40,7 @@ private extension AddEditMovieViewController {
         addActionButtons()
         addHeaderView()
         addKeyboardObservers()
+        PostersListTableViewCell.register(for: tableView)
         AddEditMovieTableViewCell.register(for: tableView)
     }
     
@@ -123,15 +124,28 @@ extension AddEditMovieViewController: UITableViewDelegate {
 // MARK: - UITableViewDataSource Methods
 extension AddEditMovieViewController: UITableViewDataSource {
     
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return viewModel?.sections.count ?? 0
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return viewModel?.numberOfFields ?? 0
+        return viewModel?.getNumberOfFields(in: section) ?? 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let viewModel = viewModel?.getCellViewModel(at: indexPath) else { return UITableViewCell() }
-        let addEditMovieCell = AddEditMovieTableViewCell.dequeReusableCell(from: tableView, at: indexPath)
-        addEditMovieCell.configure(with: viewModel)
-        return addEditMovieCell
+        guard let section = viewModel?.sections[safe: indexPath.section] else { return UITableViewCell() }
+        switch section {
+        case .posters:
+            guard let viewModel = viewModel?.getCellViewModel(at: indexPath) as? PostersListCellViewModel else { return UITableViewCell() }
+            let listCell = PostersListTableViewCell.dequeReusableCell(from: tableView, at: indexPath)
+            listCell.configure(with: viewModel, height: 0.18 * view.bounds.width)
+            return listCell
+        case .fields:
+            guard let viewModel = viewModel?.getCellViewModel(at: indexPath) as? AddEditMovieCellViewModel else { return UITableViewCell() }
+            let addEditMovieCell = AddEditMovieTableViewCell.dequeReusableCell(from: tableView, at: indexPath)
+            addEditMovieCell.configure(with: viewModel)
+            return addEditMovieCell
+        }
     }
     
 }
@@ -146,6 +160,11 @@ extension AddEditMovieViewController: AddEditMoviePresenter {
     func updateHeaderView(with scrollView: UIScrollView) {
         guard let headerView = tableView.tableHeaderView as? StretchyTableHeaderView else { return }
         headerView.scrollViewDidScroll(scrollView)
+    }
+    
+    func updateHeaderView(with image: UIImage?) {
+        guard let headerView = tableView.tableHeaderView as? StretchyTableHeaderView else { return }
+        headerView.setImage(image)
     }
     
     func showKeyboard(with height: CGFloat, duration: TimeInterval) {

@@ -16,19 +16,21 @@ protocol AddEditMovieListener: AnyObject {
 protocol AddEditMoviePresenter: AnyObject {
     func setNavigationTitle(_ title: String)
     func updateHeaderView(with scrollView: UIScrollView)
+    func updateHeaderView(with image: UIImage?)
     func showKeyboard(with height: CGFloat, duration: TimeInterval)
     func hideKeyboard(with duration: TimeInterval)
     func pop(completion: (() -> Void)?)
 }
 
 protocol AddEditMovieViewModelable {
-    var numberOfFields: Int { get }
+    var sections: [AddEditMovieViewModel.Section] { get }
     var headerViewImage: UIImage? { get }
     var presenter: AddEditMoviePresenter? { get set }
     func screenWillAppear()
+    func getNumberOfFields(in section: Int) -> Int
+    func getCellViewModel(at indexPath: IndexPath) -> CellViewModelable?
     func cancelButtonTapped()
     func doneButtonTapped()
-    func getCellViewModel(at indexPath: IndexPath) -> AddEditMovieCellViewModelable?
     func didScroll(with scrollView: UIScrollView)
     func keyboardWillShow(with frame: CGRect)
     func keyboardWillHide()
@@ -40,6 +42,11 @@ final class AddEditMovieViewModel: AddEditMovieViewModelable,
     enum Mode {
         case add
         case edit(movie: Movie)
+    }
+    
+    enum Section: Hashable {
+        case posters
+        case fields([Field])
     }
     
     enum Field: CaseIterable {
@@ -55,14 +62,19 @@ final class AddEditMovieViewModel: AddEditMovieViewModelable,
         case description
     }
     
+    let sections: [Section]
+    
     private let mode: Mode
+    private let posters: [String]
     private var updatedMovie: LocalMovie
     private weak var listener: AddEditMovieListener?
     
     weak var presenter: AddEditMoviePresenter?
     
-    init(mode: Mode, listener: AddEditMovieListener?) {
+    init(mode: Mode, posters: [String], listener: AddEditMovieListener?) {
         self.mode = mode
+        self.posters = posters
+        self.sections = [.posters, .fields(Field.allCases)]
         self.listener = listener
         self.updatedMovie = LocalMovie()
         setup()
@@ -72,10 +84,6 @@ final class AddEditMovieViewModel: AddEditMovieViewModelable,
 
 // MARK: - Exposed Helpers
 extension AddEditMovieViewModel {
-    
-    var numberOfFields: Int {
-        return Field.allCases.count
-    }
     
     var headerViewImage: UIImage? {
         switch mode {
@@ -108,9 +116,30 @@ extension AddEditMovieViewModel {
         }
     }
     
-    func getCellViewModel(at indexPath: IndexPath) -> AddEditMovieCellViewModelable? {
-        guard let field = Field.allCases[safe: indexPath.row] else { return nil }
-        return AddEditMovieCellViewModel(mode: mode, field: field, listener: self)
+    func getNumberOfFields(in section: Int) -> Int {
+        guard let section = sections[safe: section] else { return 0 }
+        switch section {
+        case .posters:
+            return 1
+        case let .fields(fields):
+            return fields.count
+        }
+    }
+    
+    func getCellViewModel(at indexPath: IndexPath) -> CellViewModelable? {
+        guard let section = sections[safe: indexPath.section] else { return nil }
+        switch section {
+        case .posters:
+            switch mode {
+            case .add:
+                return PostersListCellViewModel(posters: posters, currentPoster: nil, listener: self)
+            case let .edit(movie):
+                return PostersListCellViewModel(posters: posters, currentPoster: movie.poster, listener: self)
+            }
+        case let .fields(fields):
+            guard let field = fields[safe: indexPath.row] else { return nil }
+            return AddEditMovieCellViewModel(mode: mode, field: field, listener: self)
+        }
     }
     
     func didScroll(with scrollView: UIScrollView) {
@@ -184,6 +213,26 @@ private extension AddEditMovieViewModel {
     func showError(for field: Field) -> Bool {
         showToast(with: field.errorMessage)
         return false
+    }
+    
+}
+
+// MARK: - PostersListCellListener Methods
+extension AddEditMovieViewModel: PostersListCellListener {
+    
+    func newPosterSelected(_ poster: String) {
+        updatedMovie.poster = poster
+        switch mode {
+        case .add:
+            return
+        case .edit:
+            let image = UIImage(named: poster)
+            presenter?.updateHeaderView(with: image)
+        }
+    }
+    
+    func oldPosterDeselected() {
+        updatedMovie.poster = nil
     }
     
 }

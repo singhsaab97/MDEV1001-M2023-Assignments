@@ -148,7 +148,7 @@ private extension MoviesViewModel {
   
     /// Stores and persists data from `Movies.json` if context doesn't exist
     func saveData() {
-        guard !UserDefaults.isDataSaved,
+        guard !UserDefaults.areMoviesSaved,
               let url = Bundle.main.url(
                 forResource: Constants.jsonFileName,
                 withExtension: "json"
@@ -156,6 +156,7 @@ private extension MoviesViewModel {
               let data = try? Data(contentsOf: url),
               let jsonArray = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] else { return }
         let context = persistentContainer.viewContext
+        var posters = [String]()
         for object in jsonArray {
             let movieId = object["movieId"] as? Int16 ?? .zero
             guard !doesMovieExist(with: movieId) else { continue }
@@ -167,15 +168,25 @@ private extension MoviesViewModel {
             movie.directors = object["directors"] as? String
             movie.writers = object["writers"] as? String
             movie.actors = object["actors"] as? String
-            movie.year = object["year"] as? Int16 ?? .zero
-            movie.length = object["length"] as? Int16 ?? .zero
+            if let year = object["year"] as? Int16 {
+                movie.year = year
+            }
+            if let length = object["length"] as? Int16 {
+                movie.length = length
+            }
             movie.shortdescription = object["shortDescription"] as? String
             movie.mparating = object["mpaRating"] as? String
-            movie.criticsrating = object["criticsRating"] as? Double ?? .zero
-            movie.poster = object["poster"] as? String
+            if let criticsRating = object["criticsRating"] as? Double {
+                movie.criticsrating = criticsRating
+            }
+            if let poster = object["poster"] as? String {
+                movie.poster = poster
+                posters.append(poster)
+            }
         }
         saveContext(context)
-        UserDefaults.appSuite.set(true, forKey: UserDefaults.isDataSavedKey)
+        UserDefaults.appSuite.set(posters, forKey: UserDefaults.availablePostersKey)
+        UserDefaults.appSuite.set(true, forKey: UserDefaults.areMoviesSavedKey)
     }
     
     /// Load stored data from persistent container
@@ -228,11 +239,18 @@ private extension MoviesViewModel {
         movie.directors = updatedMovie.directors
         movie.writers = updatedMovie.writers
         movie.actors = updatedMovie.actors
-        movie.year = updatedMovie.year ?? .zero
-        movie.length = updatedMovie.length ?? .zero
+        if let year = updatedMovie.year {
+            movie.year = year
+        }
+        if let length = updatedMovie.length {
+            movie.length = length
+        }
         movie.mparating = updatedMovie.mpaRating
-        movie.criticsrating = updatedMovie.criticsRating ?? .zero
+        if let criticsRating = updatedMovie.criticsRating {
+            movie.criticsrating = criticsRating
+        }
         movie.shortdescription = updatedMovie.description
+        movie.poster = updatedMovie.poster
     }
     
     func saveContext(_ context: NSManagedObjectContext) {
@@ -245,7 +263,11 @@ private extension MoviesViewModel {
     }
     
     func showAddEditViewController(for mode: AddEditMovieViewModel.Mode) {
-        let viewModel = AddEditMovieViewModel(mode: mode, listener: self)
+        let viewModel = AddEditMovieViewModel(
+            mode: mode,
+            posters: UserDefaults.availablePosters,
+            listener: self
+        )
         let viewController = AddEditMovieViewController.loadFromStoryboard()
         viewController.viewModel = viewModel
         presenter?.push(viewController)
@@ -270,20 +292,24 @@ private extension MoviesViewModel {
         case let .delete(indexPath):
             guard let movie = movies[safe: indexPath.row],
                   let index = movies.firstIndex(of: movie) else { return }
-            context.delete(movie)
-            saveContext(context)
-            movies.removeAll(where: { $0 == movie })
-            isExpandedDict.removeValue(forKey: movie.id)
-            let indexPath = IndexPath(row: index, section: 0)
-            presenter?.deleteRows(at: [indexPath])
+            var alertTitle = Constants.delete
+            if let title = movie.title {
+                alertTitle.append(" \"\(title)\"?")
+            }
+            prepareDeleteAlert(with: alertTitle, message: Constants.deleteAlertMessage) { [weak self] in
+                guard let self = self else { return }
+                context.delete(movie)
+                self.saveContext(context)
+                self.movies.removeAll(where: { $0 == movie })
+                self.isExpandedDict.removeValue(forKey: movie.id)
+                let indexPath = IndexPath(row: index, section: 0)
+                self.presenter?.deleteRows(at: [indexPath])
+            }
         case .deleteAll:
-            let alertController = UIAlertController(
-                title: Constants.deleteAlertTitle,
-                message: Constants.deleteAlertMessage,
-                preferredStyle: .alert
-            )
-            let cancelAction = UIAlertAction(title: Constants.deleteAlertCancelTitle, style: .default)
-            let deleteAction = UIAlertAction(title: Constants.deleteAlertDeleteTitle, style: .destructive) { [weak self] _ in
+            prepareDeleteAlert(
+                with: Constants.deleteAllAlertTitle,
+                message: Constants.deleteAllAlertMessage
+            ) { [weak self] in
                 guard let self = self else { return }
                 self.movies.forEach { movie in
                     context.delete(movie)
@@ -296,9 +322,6 @@ private extension MoviesViewModel {
                 self.movies.removeAll()
                 self.presenter?.deleteRows(at: indexPaths)
             }
-            alertController.addAction(cancelAction)
-            alertController.addAction(deleteAction)
-            presenter?.present(alertController)
         }
     }
     
@@ -342,6 +365,17 @@ private extension MoviesViewModel {
         DispatchQueue.main.async { [weak self] in
             self?.presenter?.scroll(to: indexPath)
         }
+    }
+    
+    func prepareDeleteAlert(with title: String, message: String, action: @escaping () -> Void) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: Constants.deleteAlertCancelTitle, style: .default)
+        let deleteAction = UIAlertAction(title: Constants.deleteAlertDeleteTitle, style: .destructive) {_ in
+            action()
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(deleteAction)
+        presenter?.present(alertController)
     }
     
 }

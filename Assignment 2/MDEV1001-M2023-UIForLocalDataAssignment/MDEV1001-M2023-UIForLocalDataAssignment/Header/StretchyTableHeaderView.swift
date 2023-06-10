@@ -32,7 +32,9 @@ final class StretchyTableHeaderView: UIView {
 extension StretchyTableHeaderView {
     
     func setImage(_ image: UIImage?) {
-        imageView.image = image
+        UIView.transition(with: imageView, duration: Constants.animationDuration, options: .transitionCurlUp) { [weak self] in
+            self?.imageView.image = image
+        }
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {

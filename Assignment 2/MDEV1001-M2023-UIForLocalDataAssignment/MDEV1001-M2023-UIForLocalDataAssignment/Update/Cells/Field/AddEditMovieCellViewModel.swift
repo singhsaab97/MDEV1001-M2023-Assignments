@@ -12,7 +12,7 @@ protocol AddEditMovieCellListener: AnyObject {
     func movieFieldUpdated(_ field: AddEditMovieViewModel.Field, with text: String?)
 }
 
-protocol AddEditMovieCellViewModelable {
+protocol AddEditMovieCellViewModelable: CellViewModelable {
     var field: AddEditMovieViewModel.Field { get }
     var fieldText: String? { get }
     func didTypeText(_ text: String?, newText: String) -> Bool

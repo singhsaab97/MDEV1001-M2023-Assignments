@@ -29,6 +29,10 @@ struct Constants {
     static let movieCellIdentifier = String(describing: MovieTableViewCell.self)
     static let addEditMovieCellName = String(describing: AddEditMovieTableViewCell.self)
     static let addEditMovieCellIdentifier = String(describing: AddEditMovieTableViewCell.self)
+    static let postersListCellName = String(describing: PostersListTableViewCell.self)
+    static let postersListCellIdentifier = String(describing: PostersListTableViewCell.self)
+    static let posterCellName = String(describing: PosterCollectionViewCell.self)
+    static let posterCellIdentifier = String(describing: PosterCollectionViewCell.self)
     static let toastViewName = String(describing: ToastView.self)
     static let toastViewIdentifier = String(describing: ToastView.self)
     
@@ -57,8 +61,9 @@ struct Constants {
     static let descriptionFieldPlaceholder = "Summary"
     static let fieldErrorMessageSubtext = "is required"
     static let movieExistsErrorMessage = "This movie already exists in the database"
-    static let deleteAlertTitle = "Delete movies?"
-    static let deleteAlertMessage = "This action will delete all the movies in the list. It can't be undone."
+    static let deleteAlertMessage = "This action will delete it from the database permanently."
+    static let deleteAllAlertTitle = "Delete all movies?"
+    static let deleteAllAlertMessage = "This action will delete all the movies from the database permanently."
     static let deleteAlertDeleteTitle = "Delete"
     static let deleteAlertCancelTitle = "Cancel"
     

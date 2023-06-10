@@ -13,6 +13,8 @@ protocol ViewLoadable {
     static var identifier: String { get }
 }
 
+protocol CellViewModelable {}
+
 protocol Toastable {}
 
 extension ViewLoadable where Self: UIViewController {
@@ -43,6 +45,22 @@ extension ViewLoadable where Self: UITableViewCell {
     static func dequeReusableCell(from tableView: UITableView, at indexPath: IndexPath) -> Self {
         return tableView.dequeueReusableCell(
             withIdentifier: identifier,
+            for: indexPath
+        ) as! Self
+    }
+    
+}
+
+extension ViewLoadable where Self: UICollectionViewCell {
+    
+    static func register(for collectionView: UICollectionView) {
+        let nib = UINib(nibName: name, bundle: nil)
+        collectionView.register(nib, forCellWithReuseIdentifier: identifier)
+    }
+    
+    static func dequeReusableCell(from collectionView: UICollectionView, at indexPath: IndexPath) -> Self {
+        return collectionView.dequeueReusableCell(
+            withReuseIdentifier: identifier,
             for: indexPath
         ) as! Self
     }

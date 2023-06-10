@@ -20,6 +20,7 @@ struct LocalMovie {
     var mpaRating: String?
     var criticsRating: Double?
     var description: String?
+    var poster: String?
 }
 
 // MARK: - Exposed Helpers
@@ -37,7 +38,8 @@ extension LocalMovie {
             length: movie.length,
             mpaRating: movie.mparating,
             criticsRating: movie.criticsrating,
-            description: movie.shortdescription
+            description: movie.shortdescription,
+            poster: movie.poster
         )
     }
     
