@@ -53,5 +53,9 @@ struct Constants {
     static let descriptionFieldPlaceholder = "Summary"
     static let fieldErrorMessageSubtext = "is required"
     static let movieExistsErrorMessage = "This movie already exists in the database"
+    static let deleteAlertTitle = "Delete movies?"
+    static let deleteAlertMessage = "This action will delete all the movies in the list. It can't be undone."
+    static let deleteAlertDeleteTitle = "Delete"
+    static let deleteAlertCancelTitle = "Cancel"
     
 }

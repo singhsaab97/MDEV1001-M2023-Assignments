@@ -16,6 +16,7 @@ protocol MoviesPresenter: AnyObject {
     func insertRows(at indexPaths: [IndexPath])
     func deleteRows(at indexPaths: [IndexPath])
     func scroll(to indexPath: IndexPath)
+    func present(_ viewController: UIViewController)
     func push(_ viewController: UIViewController)
 }
 
@@ -27,6 +28,7 @@ protocol MoviesViewModelable {
     func screenWillAppear()
     func screenLoaded()
     func addButtonTapped()
+    func deleteAllButtonTapped()
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
     func didSelectMovie(at indexPath: IndexPath)
     func leadingSwipedMovie(at indexPath: IndexPath) -> UIContextualAction
@@ -43,13 +45,13 @@ final class MoviesViewModel: MoviesViewModelable {
     
     enum Operation {
         case add(movie: Movie)
-        case edit(indexPath: IndexPath)
+        case edit(movie: Movie)
         case delete(indexPath: IndexPath)
         case deleteAll
     }
     
     private var movies: [Movie]
-    private var isExpandedDict: [Int16: Bool]
+    private var isExpandedDict: [ObjectIdentifier: Bool]
         
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: Constants.dbModelName)
@@ -83,17 +85,7 @@ extension MoviesViewModel {
     var sortContextMenu: UIMenu {
         let actions = SortOption.allCases.map { option in
             return UIAction(title: option.title) { [weak self] _ in
-                switch option {
-                case .highestRating:
-                    // TODO
-                    break
-                case .lowestRating:
-                    // TODO
-                    break
-                case .alphabetically:
-                    // TODO
-                    break
-                }
+                self?.execute(sortingWith: option)
             }
         }
         return UIMenu(children: actions)
@@ -112,16 +104,20 @@ extension MoviesViewModel {
         showAddEditViewController(for: .add)
     }
     
+    func deleteAllButtonTapped() {
+        execute(operation: .deleteAll)
+    }
+    
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable? {
         guard let movie = movies[safe: indexPath.row],
-              let isExpanded = isExpandedDict[movie.movieid] else { return nil }
+              let isExpanded = isExpandedDict[movie.id] else { return nil }
         return MovieCellViewModel(movie: movie, isExpanded: isExpanded)
     }
     
     func didSelectMovie(at indexPath: IndexPath) {
         guard let movie = movies[safe: indexPath.row],
-              let isExpanded = isExpandedDict[movie.movieid] else { return }
-        isExpandedDict[movie.movieid] = !isExpanded
+              let isExpanded = isExpandedDict[movie.id] else { return }
+        isExpandedDict[movie.id] = !isExpanded
         presenter?.reloadRows(at: [indexPath])
     }
     
@@ -184,7 +180,7 @@ private extension MoviesViewModel {
         do {
             movies = try context.fetch(request)
             movies.forEach { movie in
-                isExpandedDict[movie.movieid] = false
+                isExpandedDict[movie.id] = false
             }
         } catch {
             logError(error)
@@ -219,6 +215,20 @@ private extension MoviesViewModel {
         execute(operation: .delete(indexPath: indexPath))
     }
     
+    func setMovie(_ movie: Movie, with updatedMovie: LocalMovie) {
+        movie.title = updatedMovie.title
+        movie.studio = updatedMovie.studio
+        movie.genres = updatedMovie.genres
+        movie.directors = updatedMovie.directors
+        movie.writers = updatedMovie.writers
+        movie.actors = updatedMovie.actors
+        movie.year = updatedMovie.year ?? .zero
+        movie.length = updatedMovie.length ?? .zero
+        movie.mparating = updatedMovie.mpaRating
+        movie.criticsrating = updatedMovie.criticsRating ?? .zero
+        movie.shortdescription = updatedMovie.description
+    }
+    
     func saveContext(_ context: NSManagedObjectContext) {
         guard context.hasChanges else { return }
         do {
@@ -241,27 +251,64 @@ private extension MoviesViewModel {
         case let .add(movie):
             saveContext(context)
             movies.append(movie)
-            isExpandedDict[movie.movieid] = false
+            isExpandedDict[movie.id] = false
             let indexPath = IndexPath(row: Int(movie.movieid - 1), section: 0)
             presenter?.insertRows(at: [indexPath])
             DispatchQueue.main.async { [weak self] in
                 self?.presenter?.scroll(to: indexPath)
             }
-        case let .edit(indexPath):
-            // TODO
-            return
+        case let .edit(movie):
+            guard let index = movies.firstIndex(where: { $0.movieid == movie.movieid }) else { return }
+            saveContext(context)
+            movies[index] = movie
+            let indexPath = IndexPath(row: index, section: 0)
+            presenter?.reloadRows(at: [indexPath])
         case let .delete(indexPath):
             guard let movie = movies[safe: indexPath.row],
                   let index = movies.firstIndex(of: movie) else { return }
             context.delete(movie)
             saveContext(context)
             movies.removeAll(where: { $0 == movie })
-            isExpandedDict.removeValue(forKey: movie.movieid)
+            isExpandedDict.removeValue(forKey: movie.id)
             let indexPath = IndexPath(row: index, section: 0)
             presenter?.deleteRows(at: [indexPath])
         case .deleteAll:
+            let alertController = UIAlertController(
+                title: Constants.deleteAlertTitle,
+                message: Constants.deleteAlertMessage,
+                preferredStyle: .alert
+            )
+            let cancelAction = UIAlertAction(title: Constants.deleteAlertCancelTitle, style: .default)
+            let deleteAction = UIAlertAction(title: Constants.deleteAlertDeleteTitle, style: .destructive) { [weak self] _ in
+                guard let self = self else { return }
+                self.movies.forEach { movie in
+                    context.delete(movie)
+                    self.isExpandedDict.removeValue(forKey: movie.id)
+                }
+                self.saveContext(context)
+                let indexPaths = self.movies.enumerated().map { (index, _) in
+                    return IndexPath(row: index, section: 0)
+                }
+                self.movies.removeAll()
+                self.presenter?.deleteRows(at: indexPaths)
+            }
+            alertController.addAction(cancelAction)
+            alertController.addAction(deleteAction)
+            presenter?.present(alertController)
+        }
+    }
+    
+    func execute(sortingWith option: SortOption) {
+        switch option {
+        case .highestRating:
             // TODO
-            return
+            break
+        case .lowestRating:
+            // TODO
+            break
+        case .alphabetically:
+            // TODO
+            break
         }
     }
     
@@ -275,22 +322,13 @@ extension MoviesViewModel: AddEditMovieListener {
         let newMovie = Movie(context: context)
         let movieId = Int16(movies.count + 1)
         newMovie.movieid = movieId
-        newMovie.title = movie.title
-        newMovie.studio = movie.studio
-        newMovie.genres = movie.genres
-        newMovie.directors = movie.directors
-        newMovie.writers = movie.writers
-        newMovie.actors = movie.actors
-        newMovie.year = movie.year ?? .zero
-        newMovie.length = movie.length ?? .zero
-        newMovie.mparating = movie.mpaRating
-        newMovie.criticsrating = movie.criticsRating ?? .zero
-        newMovie.shortdescription = movie.description
+        setMovie(newMovie, with: movie)
         execute(operation: .add(movie: newMovie))
     }
     
     func updateMovie(_ movie: Movie, with editedMovie: LocalMovie) {
-        // TODO
+        setMovie(movie, with: editedMovie)
+        execute(operation: .edit(movie: movie))
     }
     
 }

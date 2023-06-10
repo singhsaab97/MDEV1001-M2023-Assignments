@@ -56,12 +56,23 @@ private extension MoviesViewController {
             target: self,
             action: #selector(addButtonTapped)
         )
-        navigationItem.rightBarButtonItem = addButton
+        // Delete all button
+        let deleteAllButton = UIBarButtonItem(
+            barButtonSystemItem: .trash,
+            target: self,
+            action: #selector(deleteAllButtonTapped)
+        )
+        navigationItem.rightBarButtonItems = [addButton, deleteAllButton]
     }
     
     @objc
     func addButtonTapped() {
         viewModel?.addButtonTapped()
+    }
+    
+    @objc
+    func deleteAllButtonTapped() {
+        viewModel?.deleteAllButtonTapped()
     }
 
 }
@@ -114,7 +125,7 @@ extension MoviesViewController: MoviesPresenter {
     }
     
     func reloadRows(at indexPaths: [IndexPath]) {
-        tableView.reloadRows(at: indexPaths, with: .fade)
+        tableView.reloadRows(at: indexPaths, with: .automatic)
     }
     
     func insertRows(at indexPaths: [IndexPath]) {
@@ -131,6 +142,10 @@ extension MoviesViewController: MoviesPresenter {
     
     func scroll(to indexPath: IndexPath) {
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
+    }
+    
+    func present(_ viewController: UIViewController) {
+        navigationController?.present(viewController, animated: true)
     }
     
     func push(_ viewController: UIViewController) {
