@@ -11,7 +11,7 @@ import CoreData
 
 protocol MoviesPresenter: AnyObject {
     func setNavigationTitle(_ title: String)
-    func reloadData()
+    func reloadSections(_ indexSet: IndexSet)
     func reloadRows(at indexPaths: [IndexPath])
     func insertRows(at indexPaths: [IndexPath])
     func deleteRows(at indexPaths: [IndexPath])
@@ -37,10 +37,14 @@ protocol MoviesViewModelable {
 
 final class MoviesViewModel: MoviesViewModelable {
     
-    enum SortOption: CaseIterable {
+    enum SortOption: Int, CaseIterable {
+        case alphabetically
         case highestRating
         case lowestRating
-        case alphabetically
+        case latestRelease
+        case oldestRelease
+        case longestRunningTime
+        case shortestRunningTime
     }
     
     enum Operation {
@@ -97,7 +101,7 @@ extension MoviesViewModel {
     
     func screenLoaded() {
         loadData()
-        presenter?.reloadData()
+        presenter?.reloadSections(IndexSet(integer: 0))
     }
     
     func addButtonTapped() {
@@ -119,6 +123,7 @@ extension MoviesViewModel {
               let isExpanded = isExpandedDict[movie.id] else { return }
         isExpandedDict[movie.id] = !isExpanded
         presenter?.reloadRows(at: [indexPath])
+        scroll(to: indexPath)
     }
     
     func leadingSwipedMovie(at indexPath: IndexPath) -> UIContextualAction {
@@ -182,6 +187,7 @@ private extension MoviesViewModel {
             movies.forEach { movie in
                 isExpandedDict[movie.id] = false
             }
+            execute(sortingWith: UserDefaults.sortOption)
         } catch {
             logError(error)
         }
@@ -254,9 +260,7 @@ private extension MoviesViewModel {
             isExpandedDict[movie.id] = false
             let indexPath = IndexPath(row: Int(movie.movieid - 1), section: 0)
             presenter?.insertRows(at: [indexPath])
-            DispatchQueue.main.async { [weak self] in
-                self?.presenter?.scroll(to: indexPath)
-            }
+            scroll(to: indexPath)
         case let .edit(movie):
             guard let index = movies.firstIndex(where: { $0.movieid == movie.movieid }) else { return }
             saveContext(context)
@@ -299,16 +303,44 @@ private extension MoviesViewModel {
     }
     
     func execute(sortingWith option: SortOption) {
+        guard option != UserDefaults.sortOption else { return }
         switch option {
-        case .highestRating:
-            // TODO
-            break
-        case .lowestRating:
-            // TODO
-            break
         case .alphabetically:
-            // TODO
-            break
+            movies = movies.sorted(by: {
+                return $0.title ?? String() < $1.title ?? String()
+            })
+        case .highestRating:
+            movies = movies.sorted(by: {
+                return $0.criticsrating > $1.criticsrating
+            })
+        case .lowestRating:
+            movies = movies.sorted(by: {
+                return $0.criticsrating < $1.criticsrating
+            })
+        case .latestRelease:
+            movies = movies.sorted(by: {
+                return $0.year > $1.year
+            })
+        case .oldestRelease:
+            movies = movies.sorted(by: {
+                return $0.year < $1.year
+            })
+        case .longestRunningTime:
+            movies = movies.sorted(by: {
+                return $0.length > $1.length
+            })
+        case .shortestRunningTime:
+            movies = movies.sorted(by: {
+                return $0.length < $1.length
+            })
+        }
+        presenter?.reloadSections(IndexSet(integer: 0))
+        UserDefaults.appSuite.set(option.rawValue, forKey: UserDefaults.sortOptionKey)
+    }
+    
+    func scroll(to indexPath: IndexPath) {
+        DispatchQueue.main.async { [weak self] in
+            self?.presenter?.scroll(to: indexPath)
         }
     }
     
@@ -338,12 +370,20 @@ private extension MoviesViewModel.SortOption {
     
     var title: String {
         switch self {
+        case .alphabetically:
+            return Constants.alphabeticallyOption
         case .highestRating:
             return Constants.highestRatingOption
         case .lowestRating:
             return Constants.lowestRatingOption
-        case .alphabetically:
-            return Constants.alphabeticallyOption
+        case .latestRelease:
+            return Constants.latestReleaseOption
+        case .oldestRelease:
+            return Constants.oldestReleaseOption
+        case .longestRunningTime:
+            return Constants.longestRunningTimeOption
+        case .shortestRunningTime:
+            return Constants.shortestRunningTimeOption
         }
     }
     

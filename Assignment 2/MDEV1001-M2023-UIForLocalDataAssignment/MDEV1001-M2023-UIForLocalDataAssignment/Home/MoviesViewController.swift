@@ -120,12 +120,12 @@ extension MoviesViewController: MoviesPresenter {
         navigationItem.title = title
     }
     
-    func reloadData() {
-        tableView.reloadData()
+    func reloadSections(_ indexSet: IndexSet) {
+        tableView.reloadSections(IndexSet(integer: 0), with: .fade)
     }
     
     func reloadRows(at indexPaths: [IndexPath]) {
-        tableView.reloadRows(at: indexPaths, with: .automatic)
+        tableView.reloadRows(at: indexPaths, with: .fade)
     }
     
     func insertRows(at indexPaths: [IndexPath]) {
