@@ -14,6 +14,7 @@ protocol MoviesPresenter: AnyObject {
     func reloadData()
     func reloadRows(at indexPaths: [IndexPath])
     func insertRows(at indexPaths: [IndexPath])
+    func deleteRows(at indexPaths: [IndexPath])
     func scroll(to indexPath: IndexPath)
     func push(_ viewController: UIViewController)
 }
@@ -38,6 +39,13 @@ final class MoviesViewModel: MoviesViewModelable {
         case highestRating
         case lowestRating
         case alphabetically
+    }
+    
+    enum Operation {
+        case add(movie: Movie)
+        case edit(indexPath: IndexPath)
+        case delete(indexPath: IndexPath)
+        case deleteAll
     }
     
     private var movies: [Movie]
@@ -86,7 +94,6 @@ extension MoviesViewModel {
                     // TODO
                     break
                 }
-                print(option.title)
             }
         }
         return UIMenu(children: actions)
@@ -97,9 +104,8 @@ extension MoviesViewModel {
     }
     
     func screenLoaded() {
-        loadData { [weak self] in
-            self?.presenter?.reloadData()
-        }
+        loadData()
+        presenter?.reloadData()
     }
     
     func addButtonTapped() {
@@ -138,20 +144,20 @@ extension MoviesViewModel {
 
 // MARK: - Private Helpers
 private extension MoviesViewModel {
-    
+  
     /// Stores and persists data from `Movies.json` if context doesn't exist
     func saveData() {
-        guard let url = Bundle.main.url(forResource: Constants.jsonFileName, withExtension: "json"),
+        guard !UserDefaults.isDataSaved,
+              let url = Bundle.main.url(
+                forResource: Constants.jsonFileName,
+                withExtension: "json"
+              ),
               let data = try? Data(contentsOf: url),
               let jsonArray = try? JSONSerialization.jsonObject(with: data, options: []) as? [[String: Any]] else { return }
         let context = persistentContainer.viewContext
         for object in jsonArray {
             let movieId = object["movieId"] as? Int16 ?? .zero
-            guard !doesMovieExist(with: movieId) else {
-                // Set cell initially collapsed
-                isExpandedDict[movieId] = false
-                continue
-            }
+            guard !doesMovieExist(with: movieId) else { continue }
             let movie = Movie(context: context)
             movie.movieid = movieId
             movie.title = object["title"] as? String
@@ -166,19 +172,20 @@ private extension MoviesViewModel {
             movie.mparating = object["mpaRating"] as? String
             movie.criticsrating = object["criticsRating"] as? Double ?? .zero
             movie.poster = object["poster"] as? String
-            // Set cell initially collapsed
-            isExpandedDict[movieId] = false
         }
-        updateMovieContext(context)
+        saveContext(context)
+        UserDefaults.appSuite.set(true, forKey: UserDefaults.isDataSavedKey)
     }
     
     /// Load stored data from persistent container
-    func loadData(completion: @escaping () -> Void) {
+    func loadData() {
         let context = persistentContainer.viewContext
         let request = Movie.fetchRequest()
         do {
             movies = try context.fetch(request)
-            completion()
+            movies.forEach { movie in
+                isExpandedDict[movie.movieid] = false
+            }
         } catch {
             logError(error)
         }
@@ -198,14 +205,6 @@ private extension MoviesViewModel {
         }
     }
     
-    func doesMovieExist(_ movie: Movie) -> Bool {
-        return movies.contains(where: {
-            return $0.title == movie.title
-                && $0.studio == movie.studio
-                && $0.criticsrating == movie.criticsrating
-        })
-    }
-    
     func logError(_ error: Error?) {
         guard let nserror = error as? NSError else { return }
         fatalError("Unresolved error \(nserror), \(nserror.userInfo)")
@@ -216,20 +215,11 @@ private extension MoviesViewModel {
         showAddEditViewController(for: .edit(movie: movie))
     }
     
-    func insertMovie(with movieId: Int16) {
-        isExpandedDict[movieId] = false
-        let indexPath = IndexPath(row: Int(movieId - 1), section: 0)
-        presenter?.insertRows(at: [indexPath])
-        DispatchQueue.main.async { [weak self] in
-            self?.presenter?.scroll(to: indexPath)
-        }
-    }
-    
     func deleteMovie(at indexPath: IndexPath) {
-        // TODO
+        execute(operation: .delete(indexPath: indexPath))
     }
     
-    func updateMovieContext(_ context: NSManagedObjectContext) {
+    func saveContext(_ context: NSManagedObjectContext) {
         guard context.hasChanges else { return }
         do {
             try context.save()
@@ -245,6 +235,36 @@ private extension MoviesViewModel {
         presenter?.push(viewController)
     }
     
+    func execute(operation: Operation) {
+        let context = persistentContainer.viewContext
+        switch operation {
+        case let .add(movie):
+            saveContext(context)
+            movies.append(movie)
+            isExpandedDict[movie.movieid] = false
+            let indexPath = IndexPath(row: Int(movie.movieid - 1), section: 0)
+            presenter?.insertRows(at: [indexPath])
+            DispatchQueue.main.async { [weak self] in
+                self?.presenter?.scroll(to: indexPath)
+            }
+        case let .edit(indexPath):
+            // TODO
+            return
+        case let .delete(indexPath):
+            guard let movie = movies[safe: indexPath.row],
+                  let index = movies.firstIndex(of: movie) else { return }
+            context.delete(movie)
+            saveContext(context)
+            movies.removeAll(where: { $0 == movie })
+            isExpandedDict.removeValue(forKey: movie.movieid)
+            let indexPath = IndexPath(row: index, section: 0)
+            presenter?.deleteRows(at: [indexPath])
+        case .deleteAll:
+            // TODO
+            return
+        }
+    }
+    
 }
 
 // MARK: - AddEditMovieListener Methods
@@ -253,7 +273,7 @@ extension MoviesViewModel: AddEditMovieListener {
     func addNewMovie(_ movie: LocalMovie) {
         let context = persistentContainer.viewContext
         let newMovie = Movie(context: context)
-        let movieId = Int16(movies.count)
+        let movieId = Int16(movies.count + 1)
         newMovie.movieid = movieId
         newMovie.title = movie.title
         newMovie.studio = movie.studio
@@ -266,11 +286,7 @@ extension MoviesViewModel: AddEditMovieListener {
         newMovie.mparating = movie.mpaRating
         newMovie.criticsrating = movie.criticsRating ?? .zero
         newMovie.shortdescription = movie.description
-        updateMovieContext(context)
-        loadData { [weak self] in
-            // Insert new movie
-            self?.insertMovie(with: movieId)
-        }
+        execute(operation: .add(movie: newMovie))
     }
     
     func updateMovie(_ movie: Movie, with editedMovie: LocalMovie) {

@@ -16,7 +16,7 @@
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
                 <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="UaN-oM-YtC">
-                    <rect key="frame" x="20" y="15" width="353" height="788"/>
+                    <rect key="frame" x="20" y="15" width="353" height="822"/>
                     <subviews>
                         <stackView opaque="NO" contentMode="scaleToFill" distribution="equalCentering" alignment="center" spacing="20" translatesAutoresizingMaskIntoConstraints="NO" id="haN-fZ-r8X">
                             <rect key="frame" x="0.0" y="0.0" width="353" height="63.666666666666664"/>
@@ -73,7 +73,7 @@
                             </constraints>
                         </stackView>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vYl-Ba-ara">
-                            <rect key="frame" x="0.0" y="772.66666666666663" width="353" height="15.333333333333371"/>
+                            <rect key="frame" x="0.0" y="806.66666666666663" width="353" height="15.333333333333371"/>
                             <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="13"/>
                             <nil key="textColor"/>
                             <nil key="highlightedColor"/>
@@ -86,7 +86,7 @@
             <accessibility key="accessibilityConfiguration" identifier="MovieTableViewCell"/>
             <constraints>
                 <constraint firstItem="UaN-oM-YtC" firstAttribute="top" secondItem="iN0-l3-epB" secondAttribute="top" constant="15" id="FXn-or-nWi"/>
-                <constraint firstItem="vUN-kp-3ea" firstAttribute="bottom" secondItem="UaN-oM-YtC" secondAttribute="bottom" constant="15" id="Fnh-6U-gfZ"/>
+                <constraint firstAttribute="bottom" secondItem="UaN-oM-YtC" secondAttribute="bottom" priority="999" constant="15" id="Fnh-6U-gfZ"/>
                 <constraint firstItem="UaN-oM-YtC" firstAttribute="leading" secondItem="vUN-kp-3ea" secondAttribute="leading" constant="20" id="Tnj-Rw-h9z"/>
                 <constraint firstItem="vUN-kp-3ea" firstAttribute="trailing" secondItem="UaN-oM-YtC" secondAttribute="trailing" constant="20" id="U21-E2-ODQ"/>
             </constraints>

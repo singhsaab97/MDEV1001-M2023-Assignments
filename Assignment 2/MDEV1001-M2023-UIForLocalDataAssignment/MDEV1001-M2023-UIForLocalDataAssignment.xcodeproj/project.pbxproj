@@ -32,6 +32,7 @@
 		7C8B8B932A33B3E700372138 /* ToastView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C8B8B922A33B3E700372138 /* ToastView.swift */; };
 		7C8B8B952A33B3FC00372138 /* ToastView.xib in Resources */ = {isa = PBXBuildFile; fileRef = 7C8B8B942A33B3FC00372138 /* ToastView.xib */; };
 		7CAA7D0F2A341C7500B7B2A3 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAA7D0E2A341C7500B7B2A3 /* UIViewController+Extensions.swift */; };
+		7CAA7D132A342ECA00B7B2A3 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAA7D122A342ECA00B7B2A3 /* UserDefaults+Extensions.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +63,7 @@
 		7C8B8B922A33B3E700372138 /* ToastView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ToastView.swift; sourceTree = "<group>"; };
 		7C8B8B942A33B3FC00372138 /* ToastView.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = ToastView.xib; sourceTree = "<group>"; };
 		7CAA7D0E2A341C7500B7B2A3 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
+		7CAA7D122A342ECA00B7B2A3 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -140,6 +142,7 @@
 			children = (
 				7C8B8B3F2A31928D00372138 /* Array+Extensions.swift */,
 				7CAA7D0E2A341C7500B7B2A3 /* UIViewController+Extensions.swift */,
+				7CAA7D122A342ECA00B7B2A3 /* UserDefaults+Extensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -275,6 +278,7 @@
 				7C8B8B932A33B3E700372138 /* ToastView.swift in Sources */,
 				7C1CAFDA2A318DA100CF160B /* AppDelegate.swift in Sources */,
 				7C8B8B402A31928D00372138 /* Array+Extensions.swift in Sources */,
+				7CAA7D132A342ECA00B7B2A3 /* UserDefaults+Extensions.swift in Sources */,
 				7C8B8B462A31935900372138 /* Movie.xcdatamodeld in Sources */,
 				7CAA7D0F2A341C7500B7B2A3 /* UIViewController+Extensions.swift in Sources */,
 				7C8B8B422A31932500372138 /* MovieTableViewCell.swift in Sources */,

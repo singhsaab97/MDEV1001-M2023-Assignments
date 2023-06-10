@@ -19,6 +19,7 @@ struct Constants {
     static let toastAnimationDuration: TimeInterval = 0.3
     static let toastDisplayDuration: TimeInterval = 3
     
+    static let suiteName = Bundle.main.infoDictionary!["CFBundleName"] as! String
     static let dbModelName = "Movie"
     static let jsonFileName = "Movies"
     static let storyboardName = "Main"

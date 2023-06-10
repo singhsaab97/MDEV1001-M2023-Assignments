@@ -123,6 +123,12 @@ extension MoviesViewController: MoviesPresenter {
         tableView.endUpdates()
     }
     
+    func deleteRows(at indexPaths: [IndexPath]) {
+        tableView.beginUpdates()
+        tableView.deleteRows(at: indexPaths, with: .right)
+        tableView.endUpdates()
+    }
+    
     func scroll(to indexPath: IndexPath) {
         tableView.scrollToRow(at: indexPath, at: .bottom, animated: true)
     }
