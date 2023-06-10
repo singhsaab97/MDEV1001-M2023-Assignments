@@ -16,6 +16,8 @@ protocol AddEditMovieListener: AnyObject {
 protocol AddEditMoviePresenter: AnyObject {
     func setNavigationTitle(_ title: String)
     func updateHeaderView(with scrollView: UIScrollView)
+    func showKeyboard(with height: CGFloat, duration: TimeInterval)
+    func hideKeyboard(with duration: TimeInterval)
     func pop(completion: (() -> Void)?)
 }
 
@@ -28,6 +30,8 @@ protocol AddEditMovieViewModelable {
     func doneButtonTapped()
     func getCellViewModel(at indexPath: IndexPath) -> AddEditMovieCellViewModelable?
     func didScroll(with scrollView: UIScrollView)
+    func keyboardWillShow(with frame: CGRect)
+    func keyboardWillHide()
 }
 
 final class AddEditMovieViewModel: AddEditMovieViewModelable,
@@ -111,6 +115,14 @@ extension AddEditMovieViewModel {
     
     func didScroll(with scrollView: UIScrollView) {
         presenter?.updateHeaderView(with: scrollView)
+    }
+    
+    func keyboardWillShow(with frame: CGRect) {
+        presenter?.showKeyboard(with: frame.height, duration: Constants.animationDuration)
+    }
+    
+    func keyboardWillHide() {
+        presenter?.hideKeyboard(with: Constants.animationDuration)
     }
     
 }

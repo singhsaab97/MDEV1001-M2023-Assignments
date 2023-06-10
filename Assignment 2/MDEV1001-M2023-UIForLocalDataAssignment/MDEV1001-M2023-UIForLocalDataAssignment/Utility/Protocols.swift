@@ -67,11 +67,11 @@ extension Toastable {
         view.widthAnchor.constraint(lessThanOrEqualTo: window.widthAnchor, constant: 40).isActive = true
         view.centerXAnchor.constraint(equalTo: window.centerXAnchor).isActive = true
         // Animate
-        UIView.animate(withDuration: Constants.toastAnimationDuration) { [weak view] in
+        UIView.animate(withDuration: Constants.animationDuration) { [weak view] in
             view?.alpha = 1
             // Disapeear after a few seconds
             DispatchQueue.main.asyncAfter(deadline: .now() + Constants.toastDisplayDuration) { [weak view] in
-                UIView.animate(withDuration: Constants.toastAnimationDuration) { [weak view] in
+                UIView.animate(withDuration: Constants.animationDuration) { [weak view] in
                     view?.alpha = .zero
                 } completion: { [weak view] _ in
                     view?.removeFromSuperview()

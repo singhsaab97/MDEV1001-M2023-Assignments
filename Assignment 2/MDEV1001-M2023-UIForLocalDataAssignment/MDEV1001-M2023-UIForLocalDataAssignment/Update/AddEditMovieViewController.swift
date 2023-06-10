@@ -15,6 +15,7 @@ final class AddEditMovieViewController: UIViewController,
     static var identifier = Constants.addEditMovieViewControllerIdentifier
     
     @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var tableViewBottomConstraint: NSLayoutConstraint!
     
     var viewModel: AddEditMovieViewModelable?
 
@@ -38,6 +39,7 @@ private extension AddEditMovieViewController {
         navigationItem.largeTitleDisplayMode = .never
         addActionButtons()
         addHeaderView()
+        addKeyboardObservers()
         AddEditMovieTableViewCell.register(for: tableView)
     }
     
@@ -60,10 +62,41 @@ private extension AddEditMovieViewController {
     
     func addHeaderView() {
         guard let image = viewModel?.headerViewImage else { return }
-        let frame = CGRect(x: 0, y: 0, width: view.bounds.width, height: Constants.headerViewHeight)
+        let frame = CGRect(
+            x: 0,
+            y: 0,
+            width: view.bounds.width,
+            height: Constants.headerViewHeight
+        )
         let headerView = StretchyTableHeaderView(frame: frame)
         headerView.setImage(image)
         tableView.tableHeaderView = headerView
+    }
+    
+    func addKeyboardObservers() {
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillShowNotification,
+            object: nil,
+            queue: nil
+        ) { [weak self] notification in
+            self?.keyboardWillShow(notification)
+        }
+        NotificationCenter.default.addObserver(
+            forName: UIResponder.keyboardWillHideNotification,
+            object: nil,
+            queue: nil
+        ) { [weak self] _ in
+            self?.keyboardWillHide()
+        }
+    }
+    
+    func keyboardWillShow(_ notification: Notification) {
+        guard let frame = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else { return }
+        viewModel?.keyboardWillShow(with: frame)
+    }
+    
+    func keyboardWillHide() {
+        viewModel?.keyboardWillHide()
     }
     
     @objc
@@ -113,6 +146,20 @@ extension AddEditMovieViewController: AddEditMoviePresenter {
     func updateHeaderView(with scrollView: UIScrollView) {
         guard let headerView = tableView.tableHeaderView as? StretchyTableHeaderView else { return }
         headerView.scrollViewDidScroll(scrollView)
+    }
+    
+    func showKeyboard(with height: CGFloat, duration: TimeInterval) {
+        tableViewBottomConstraint.constant = height
+        UIView.animate(withDuration: duration) { [weak self] in
+            self?.view?.layoutIfNeeded()
+        }
+    }
+    
+    func hideKeyboard(with duration: TimeInterval) {
+        tableViewBottomConstraint.constant = .zero
+        UIView.animate(withDuration: duration) { [weak self] in
+            self?.view?.layoutIfNeeded()
+        }
     }
     
     func pop(completion: (() -> Void)?) {

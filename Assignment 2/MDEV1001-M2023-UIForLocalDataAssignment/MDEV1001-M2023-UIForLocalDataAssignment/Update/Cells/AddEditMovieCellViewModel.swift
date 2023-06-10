@@ -114,12 +114,14 @@ extension AddEditMovieViewModel.Field {
     
     var keyboardType: UIKeyboardType {
         switch self {
-        case .title, .studio, .genres, .directors, .writers, .mpaRating, .description:
-            return .default
+        case .title, .studio, .genres, .directors, .writers, .mpaRating:
+            return .alphabet
         case .year, .length:
             return .numberPad
         case .criticsRating:
             return .decimalPad
+        case .description:
+            return .default
         }
     }
     
