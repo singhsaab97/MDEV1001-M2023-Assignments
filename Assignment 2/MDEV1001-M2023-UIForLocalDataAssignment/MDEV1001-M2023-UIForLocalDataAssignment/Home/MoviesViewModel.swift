@@ -89,6 +89,7 @@ extension MoviesViewModel {
     var sortContextMenu: UIMenu {
         let actions = SortOption.allCases.map { option in
             return UIAction(title: option.title) { [weak self] _ in
+                guard option != UserDefaults.sortOption else { return }
                 self?.execute(sortingWith: option)
             }
         }
@@ -327,7 +328,6 @@ private extension MoviesViewModel {
     }
     
     func execute(sortingWith option: SortOption) {
-        guard option != UserDefaults.sortOption else { return }
         switch option {
         case .alphabetically:
             movies = movies.sorted(by: {
