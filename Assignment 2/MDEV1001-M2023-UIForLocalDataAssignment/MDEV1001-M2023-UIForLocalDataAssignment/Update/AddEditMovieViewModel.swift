@@ -11,6 +11,7 @@ import UIKit
 protocol AddEditMovieListener: AnyObject {
     func addNewMovie(_ movie: LocalMovie)
     func updateMovie(_ movie: Movie, with editedMovie: LocalMovie)
+    func doesMovieExist(_ movie: LocalMovie) -> Bool
 }
 
 protocol AddEditMoviePresenter: AnyObject {
@@ -105,12 +106,20 @@ extension AddEditMovieViewModel {
     
     func doneButtonTapped() {
         guard validateMovieEntry() else { return }
-        presenter?.pop { [weak self] in
-            guard let self = self else { return }
-            switch self.mode {
-            case .add:
+        
+        switch self.mode {
+        case .add:
+            guard !(listener?.doesMovieExist(updatedMovie) ?? false) else {
+                showToast(with: Constants.movieExistsErrorMessage)
+                return
+            }
+            presenter?.pop { [weak self] in
+                guard let self = self else { return }
                 self.listener?.addNewMovie(self.updatedMovie)
-            case let .edit(movie):
+            }
+        case let .edit(movie):
+            presenter?.pop { [weak self] in
+                guard let self = self else { return }
                 self.listener?.updateMovie(movie, with: self.updatedMovie)
             }
         }

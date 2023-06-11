@@ -25,6 +25,10 @@ struct LocalMovie {
 
 // MARK: - Exposed Helpers
 extension LocalMovie {
+    
+    func isEqual(to movie: Movie) -> Bool {
+        return title == movie.title && studio == movie.studio
+    }
 
     static func transform(with movie: Movie) -> LocalMovie {
         return LocalMovie(

@@ -247,7 +247,8 @@ private extension MoviesViewModel {
         }
         movie.mparating = updatedMovie.mpaRating
         if let criticsRating = updatedMovie.criticsRating {
-            movie.criticsrating = criticsRating
+            // Limit to one decimal place
+            movie.criticsrating = floor(criticsRating * 10) / 10
         }
         movie.shortdescription = updatedMovie.description
         movie.poster = updatedMovie.poster
@@ -395,6 +396,10 @@ extension MoviesViewModel: AddEditMovieListener {
     func updateMovie(_ movie: Movie, with editedMovie: LocalMovie) {
         setMovie(movie, with: editedMovie)
         execute(operation: .edit(movie: movie))
+    }
+    
+    func doesMovieExist(_ movie: LocalMovie) -> Bool {
+        return movies.contains(where: { movie.isEqual(to: $0) })
     }
     
 }
