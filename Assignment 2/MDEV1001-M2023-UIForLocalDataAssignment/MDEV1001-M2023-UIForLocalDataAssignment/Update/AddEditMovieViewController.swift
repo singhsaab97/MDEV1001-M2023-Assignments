@@ -70,7 +70,7 @@ private extension AddEditMovieViewController {
             height: Constants.headerViewHeight
         )
         let headerView = StretchyTableHeaderView(frame: frame)
-        headerView.setImage(image)
+        headerView.setImage(image, isAnimated: false)
         tableView.tableHeaderView = headerView
     }
     
@@ -164,7 +164,7 @@ extension AddEditMovieViewController: AddEditMoviePresenter {
     
     func updateHeaderView(with image: UIImage?) {
         guard let headerView = tableView.tableHeaderView as? StretchyTableHeaderView else { return }
-        headerView.setImage(image)
+        headerView.setImage(image, isAnimated: true)
     }
     
     func showKeyboard(with height: CGFloat, duration: TimeInterval) {

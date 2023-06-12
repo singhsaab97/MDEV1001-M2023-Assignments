@@ -35,12 +35,12 @@ final class MoviesViewController: UIViewController,
 private extension MoviesViewController {
     
     func setup() {
-        addActionButtons()
+        addActionItems()
         MovieTableViewCell.register(for: tableView)
         viewModel?.screenLoaded()
     }
     
-    func addActionButtons() {
+    func addActionItems() {
         // Sort button
         let sortButton = UIBarButtonItem(
             title: viewModel?.sortButtonTitle,
@@ -63,6 +63,11 @@ private extension MoviesViewController {
             action: #selector(deleteAllButtonTapped)
         )
         navigationItem.rightBarButtonItems = [addButton, deleteAllButton]
+        // Search controller
+        let searchController = UISearchController()
+        searchController.delegate = self
+        searchController.searchBar.delegate = self
+        navigationItem.searchController = searchController
     }
     
     @objc
@@ -109,6 +114,24 @@ extension MoviesViewController: UITableViewDataSource {
         let movieCell = MovieTableViewCell.dequeReusableCell(from: tableView, at: indexPath)
         movieCell.configure(with: viewModel)
         return movieCell
+    }
+    
+}
+
+// MARK: - UISearchControllerDelegate Methods
+extension MoviesViewController: UISearchControllerDelegate {
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        viewModel?.cancelSearchButtonTapped()
+    }
+    
+}
+
+// MARK: - UISearchBarDelegate Methods
+extension MoviesViewController: UISearchBarDelegate {
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        viewModel?.didTypeSearchText(searchText)
     }
     
 }

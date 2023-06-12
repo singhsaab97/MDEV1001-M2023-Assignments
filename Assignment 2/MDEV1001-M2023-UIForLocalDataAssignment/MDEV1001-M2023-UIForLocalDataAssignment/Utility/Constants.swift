@@ -60,6 +60,8 @@ struct Constants {
     static let criticsRatingFieldPlaceholder = "Critics rating"
     static let descriptionFieldPlaceholder = "Summary"
     static let fieldErrorMessageSubtext = "is required"
+    static let cannotDeleteDuringSearchMessage = "Deletion cannot be performed while searching"
+    static let cannotEditDuringSearchMessage = "Editing cannot be performed while searching"
     static let movieExistsErrorMessage = "This movie already exists in the database"
     static let deleteAlertMessage = "This action will delete it from the database permanently."
     static let deleteAllAlertTitle = "Delete all movies?"

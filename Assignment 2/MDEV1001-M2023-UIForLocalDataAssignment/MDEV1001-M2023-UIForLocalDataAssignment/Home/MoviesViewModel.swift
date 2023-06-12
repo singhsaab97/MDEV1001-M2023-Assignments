@@ -29,13 +29,16 @@ protocol MoviesViewModelable {
     func screenLoaded()
     func addButtonTapped()
     func deleteAllButtonTapped()
+    func cancelSearchButtonTapped()
+    func didTypeSearchText(_ text: String)
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
     func didSelectMovie(at indexPath: IndexPath)
     func leadingSwipedMovie(at indexPath: IndexPath) -> UIContextualAction
     func trailingSwipedMovie(at indexPath: IndexPath) -> UISwipeActionsConfiguration
 }
 
-final class MoviesViewModel: MoviesViewModelable {
+final class MoviesViewModel: MoviesViewModelable,
+                             Toastable {
     
     enum SortOption: Int, CaseIterable {
         case alphabetically
@@ -55,7 +58,9 @@ final class MoviesViewModel: MoviesViewModelable {
     }
     
     private var movies: [Movie]
+    private var filteredMovies: [Movie]
     private var isExpandedDict: [ObjectIdentifier: Bool]
+    private var isSearching: Bool
         
     private lazy var persistentContainer: NSPersistentContainer = {
         let container = NSPersistentContainer(name: Constants.dbModelName)
@@ -69,7 +74,9 @@ final class MoviesViewModel: MoviesViewModelable {
     
     init() {
         self.movies = []
+        self.filteredMovies = []
         self.isExpandedDict = [:]
+        self.isSearching = false
         saveData()
     }
     
@@ -79,7 +86,7 @@ final class MoviesViewModel: MoviesViewModelable {
 extension MoviesViewModel {
     
     var numberOfMovies: Int {
-        return movies.count
+        return isSearching ? filteredMovies.count : movies.count
     }
     
     var sortButtonTitle: String {
@@ -113,7 +120,22 @@ extension MoviesViewModel {
         execute(operation: .deleteAll)
     }
     
+    func cancelSearchButtonTapped() {
+        isSearching = false
+        filteredMovies = []
+        presenter?.reloadSections(IndexSet(integer: 0))
+    }
+    
+    func didTypeSearchText(_ text: String) {
+        isSearching = !text.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        filteredMovies = movies.filter {
+            return $0.title?.contains(text) ?? false
+        }
+        presenter?.reloadSections(IndexSet(integer: 0))
+    }
+    
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable? {
+        let movies = isSearching ? filteredMovies : movies
         guard let movie = movies[safe: indexPath.row],
               let isExpanded = isExpandedDict[movie.id] else { return nil }
         return MovieCellViewModel(movie: movie, isExpanded: isExpanded)
@@ -225,11 +247,19 @@ private extension MoviesViewModel {
     }
     
     func editMovie(at indexPath: IndexPath) {
+        guard !isSearching else {
+            showToast(with: Constants.cannotEditDuringSearchMessage)
+            return
+        }
         guard let movie = movies[safe: indexPath.row] else { return }
         showAddEditViewController(for: .edit(movie: movie))
     }
     
     func deleteMovie(at indexPath: IndexPath) {
+        guard !isSearching else {
+            showToast(with: Constants.cannotDeleteDuringSearchMessage)
+            return
+        }
         execute(operation: .delete(indexPath: indexPath))
     }
     
@@ -284,13 +314,14 @@ private extension MoviesViewModel {
             isExpandedDict[movie.id] = false
             let indexPath = IndexPath(row: Int(movie.movieid - 1), section: 0)
             presenter?.insertRows(at: [indexPath])
-            scroll(to: indexPath)
+            sortAndScroll(to: movie)
         case let .edit(movie):
             guard let index = movies.firstIndex(where: { $0.movieid == movie.movieid }) else { return }
             saveContext(context)
             movies[index] = movie
             let indexPath = IndexPath(row: index, section: 0)
             presenter?.reloadRows(at: [indexPath])
+            sortAndScroll(to: movie)
         case let .delete(indexPath):
             guard let movie = movies[safe: indexPath.row],
                   let index = movies.firstIndex(of: movie) else { return }
@@ -308,6 +339,10 @@ private extension MoviesViewModel {
                 self.presenter?.deleteRows(at: [indexPath])
             }
         case .deleteAll:
+            guard !isSearching else {
+                showToast(with: Constants.cannotDeleteDuringSearchMessage)
+                return
+            }
             prepareDeleteAlert(
                 with: Constants.deleteAllAlertTitle,
                 message: Constants.deleteAllAlertMessage
@@ -365,6 +400,16 @@ private extension MoviesViewModel {
     func scroll(to indexPath: IndexPath) {
         DispatchQueue.main.async { [weak self] in
             self?.presenter?.scroll(to: indexPath)
+        }
+    }
+    
+    /// Called after adding or updating a movie to place the it on appropriate index based on the current sort option
+    func sortAndScroll(to movie: Movie) {
+        DispatchQueue.main.async { [weak self] in
+            self?.execute(sortingWith: UserDefaults.sortOption)
+            guard let index = self?.movies.firstIndex(of: movie) else { return }
+            let indexPath = IndexPath(row: index, section: 0)
+            self?.scroll(to: indexPath)
         }
     }
     

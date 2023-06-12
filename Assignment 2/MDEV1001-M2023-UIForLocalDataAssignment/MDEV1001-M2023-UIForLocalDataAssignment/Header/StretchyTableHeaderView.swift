@@ -31,9 +31,13 @@ final class StretchyTableHeaderView: UIView {
 // MARK: - Exposed Helpers
 extension StretchyTableHeaderView {
     
-    func setImage(_ image: UIImage?) {
+    func setImage(_ image: UIImage?, isAnimated: Bool) {
+        guard isAnimated else {
+            imageView.image = image
+            return
+        }
         UIView.transition(with: imageView, duration: Constants.animationDuration, options: .transitionCurlUp) { [weak self] in
-            self?.imageView.image = image
+            self?.setImage(image, isAnimated: false)
         }
     }
     
