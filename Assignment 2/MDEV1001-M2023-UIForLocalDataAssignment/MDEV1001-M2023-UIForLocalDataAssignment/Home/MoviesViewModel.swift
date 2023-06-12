@@ -22,7 +22,7 @@ protocol MoviesPresenter: AnyObject {
 
 protocol MoviesViewModelable {
     var numberOfMovies: Int { get }
-    var sortButtonTitle: String { get }
+    var sortButtonImage: UIImage? { get }
     var sortContextMenu: UIMenu { get }
     var presenter: MoviesPresenter? { get set }
     func screenWillAppear()
@@ -89,8 +89,8 @@ extension MoviesViewModel {
         return isSearching ? filteredMovies.count : movies.count
     }
     
-    var sortButtonTitle: String {
-        return Constants.sort
+    var sortButtonImage: UIImage? {
+        return UIImage(systemName: "square.stack")
     }
     
     var sortContextMenu: UIMenu {

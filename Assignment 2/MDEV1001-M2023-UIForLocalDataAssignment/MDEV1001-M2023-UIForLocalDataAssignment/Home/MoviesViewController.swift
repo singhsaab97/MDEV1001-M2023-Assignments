@@ -43,7 +43,7 @@ private extension MoviesViewController {
     func addActionItems() {
         // Sort button
         let sortButton = UIBarButtonItem(
-            title: viewModel?.sortButtonTitle,
+            image: viewModel?.sortButtonImage,
             style: .plain,
             target: self,
             action: nil
