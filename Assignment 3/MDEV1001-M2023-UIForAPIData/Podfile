@@ -1,0 +1,12 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '9.0'
+
+target 'MDEV1001-M2023-UIForAPIData' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for MDEV1001-M2023-UIForAPIData
+  pod 'Moya', '~> 15.0'
+  pod 'SDWebImage', '~> 5.0'
+
+end
