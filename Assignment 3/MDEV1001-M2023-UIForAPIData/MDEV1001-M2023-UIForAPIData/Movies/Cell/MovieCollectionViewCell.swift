@@ -35,7 +35,7 @@ extension MovieCollectionViewCell {
     }
     
     static func calculateHeight(with viewModel: MovieCellViewModelable, width: CGFloat) -> CGFloat {
-        let verticalSpacing: CGFloat = 17
+        let verticalSpacing: CGFloat = 16
         let posterImageViewHeight = width / 0.85 // Using aspect ratio
         let titleLabelHeight: CGFloat = 20
         let typeAndYearLabelHeight: CGFloat = 17
@@ -51,6 +51,11 @@ extension MovieCollectionViewCell {
 private extension MovieCollectionViewCell {
     
     func setup() {
+        setupPosterImageView()
+    }
+    
+    func setupPosterImageView() {
+        posterImageView.backgroundColor = Color.secondaryBackground.shade
         posterImageView.layer.cornerRadius = 16
     }
     

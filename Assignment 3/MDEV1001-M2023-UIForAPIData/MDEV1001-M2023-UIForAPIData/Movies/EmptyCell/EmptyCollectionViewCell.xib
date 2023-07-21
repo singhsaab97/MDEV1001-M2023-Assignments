@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="21701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21678"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="EmptyCollectionViewCell" id="gTV-IL-0wX" customClass="EmptyCollectionViewCell" customModule="MDEV1001_M2023_UIForAPIData" customModuleProvider="target">
+            <rect key="frame" x="0.0" y="0.0" width="1093" height="1165"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
+                <rect key="frame" x="0.0" y="0.0" width="1093" height="1165"/>
+                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                <subviews>
+                    <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalCentering" alignment="center" spacing="40" translatesAutoresizingMaskIntoConstraints="NO" id="UtJ-n0-10H">
+                        <rect key="frame" x="40" y="358.33333333333337" width="1013" height="473.33333333333337"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="Sp4-36-kXh">
+                                <rect key="frame" x="315.33333333333337" y="0.0" width="382.33333333333337" height="382.33333333333331"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="Sp4-36-kXh" secondAttribute="height" id="jaz-yI-gOD"/>
+                                </constraints>
+                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="Gem-2z-uTt">
+                                <rect key="frame" x="483.66666666666663" y="422.33333333333331" width="45.666666666666629" height="51"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lPN-9j-r9s">
+                                        <rect key="frame" x="0.0" y="0.0" width="45.666666666666664" height="21.666666666666668"/>
+                                        <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
+                                        <color key="textColor" name="label"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="9lu-BH-HLq">
+                                        <rect key="frame" x="0.0" y="31.666666666666742" width="45.666666666666664" height="19.333333333333329"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                        <color key="textColor" name="secondaryLabel"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                    </stackView>
+                </subviews>
+            </view>
+            <viewLayoutGuide key="safeArea" id="ZTg-uK-7eu"/>
+            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+            <constraints>
+                <constraint firstItem="UtJ-n0-10H" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" constant="40" id="1dd-xN-zrd"/>
+                <constraint firstItem="UtJ-n0-10H" firstAttribute="centerY" secondItem="ZTg-uK-7eu" secondAttribute="centerY" id="Bj1-bf-i4j"/>
+                <constraint firstAttribute="trailing" secondItem="UtJ-n0-10H" secondAttribute="trailing" constant="40" id="doQ-jg-R4u"/>
+                <constraint firstItem="Sp4-36-kXh" firstAttribute="width" secondItem="gTV-IL-0wX" secondAttribute="width" multiplier="0.35" id="tWz-Gx-7nx"/>
+            </constraints>
+            <size key="customSize" width="1093" height="1165"/>
+            <connections>
+                <outlet property="emptyImageView" destination="Sp4-36-kXh" id="GJi-AX-r9m"/>
+                <outlet property="messageLabel" destination="9lu-BH-HLq" id="CfI-VK-hQC"/>
+                <outlet property="titleLabel" destination="lPN-9j-r9s" id="E4r-N2-Ne7"/>
+            </connections>
+            <point key="canvasLocation" x="787.02290076335873" y="412.32394366197184"/>
+        </collectionViewCell>
+    </objects>
+    <resources>
+        <namedColor name="label">
+            <color red="0.093999996781349182" green="0.10199999809265137" blue="0.12200000137090683" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+        <namedColor name="secondaryLabel">
+            <color red="0.36500000953674316" green="0.36899998784065247" blue="0.3880000114440918" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
+    </resources>
+</document>

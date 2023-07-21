@@ -31,7 +31,7 @@
                         <nil key="highlightedColor"/>
                     </label>
                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="438-1i-rnB">
-                        <rect key="frame" x="0.0" y="245.66666666666666" width="178" height="16.999999999999972"/>
+                        <rect key="frame" x="0.0" y="244.66666666666666" width="178" height="16.999999999999972"/>
                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="14"/>
                         <color key="textColor" name="secondaryLabel"/>
                         <nil key="highlightedColor"/>
@@ -47,7 +47,7 @@
                 <constraint firstAttribute="trailing" secondItem="438-1i-rnB" secondAttribute="trailing" id="PPT-CF-WCD"/>
                 <constraint firstItem="QqN-RJ-OPe" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="YXX-Ll-8lE"/>
                 <constraint firstItem="nwg-EG-9hj" firstAttribute="leading" secondItem="gTV-IL-0wX" secondAttribute="leading" id="aTW-b5-30Z"/>
-                <constraint firstItem="438-1i-rnB" firstAttribute="top" secondItem="nwg-EG-9hj" secondAttribute="bottom" constant="5" id="lGf-sc-AD9"/>
+                <constraint firstItem="438-1i-rnB" firstAttribute="top" secondItem="nwg-EG-9hj" secondAttribute="bottom" constant="4" id="lGf-sc-AD9"/>
                 <constraint firstAttribute="trailing" secondItem="QqN-RJ-OPe" secondAttribute="trailing" id="mnu-xz-jXZ"/>
                 <constraint firstItem="nwg-EG-9hj" firstAttribute="top" secondItem="QqN-RJ-OPe" secondAttribute="bottom" constant="12" id="wWg-n8-w2q"/>
             </constraints>

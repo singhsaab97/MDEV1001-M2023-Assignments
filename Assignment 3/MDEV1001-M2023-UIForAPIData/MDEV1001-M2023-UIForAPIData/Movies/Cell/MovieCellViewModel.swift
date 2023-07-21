@@ -9,8 +9,8 @@ import UIKit
 
 protocol MovieCellViewModelable {
     var posterUrl: URL? { get }
-    var title: String { get }
-    var typeAndYear: String { get }
+    var title: String? { get }
+    var typeAndYear: String? { get }
 }
 
 final class MovieCellViewModel: MovieCellViewModelable {
@@ -30,12 +30,14 @@ extension MovieCellViewModel {
         return movie.posterUrl
     }
     
-    var title: String {
+    var title: String? {
         return movie.title
     }
     
-    var typeAndYear: String {
-        return "\(movie.type.rawValue.capitalizedInitial)  •  \(movie.year)"
+    var typeAndYear: String? {
+        guard let type = movie.type?.rawValue.capitalizedInitial,
+              let year = movie.year else { return nil }
+        return "\(type)  •  \(year)"
     }
    
 }

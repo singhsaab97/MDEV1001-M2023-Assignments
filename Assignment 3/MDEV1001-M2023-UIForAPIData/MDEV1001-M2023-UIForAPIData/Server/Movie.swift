@@ -14,24 +14,25 @@ enum MovieType: String, Codable {
 }
 
 struct Movie: Codable {
-    let title: String
-    let year: String
-    let rated: String
-    let released: String
-    let duration: String
-    let genre: String
-    let director: String
-    let writer: String
-    let actors: String
-    let summary: String
-    let language: String
-    let country: String
-    let awards: String
-    let rating: String
-    let poster: String
-    let type: MovieType
+    let title: String?
+    let year: String?
+    let rated: String?
+    let released: String?
+    let duration: String?
+    let genre: String?
+    let director: String?
+    let writer: String?
+    let actors: String?
+    let summary: String?
+    let language: String?
+    let country: String?
+    let awards: String?
+    let rating: String?
+    let poster: String?
+    let type: MovieType?
     
     var posterUrl: URL? {
+        guard let poster = poster else { return nil }
         return URL(string: poster)
     }
     
@@ -52,6 +53,15 @@ struct Movie: Codable {
         case rating = "imdbRating"
         case poster = "Poster"
         case type = "Type"
+    }
+    
+}
+
+struct MovieSearchResult: Codable {
+    let models: [Movie]
+    
+    private enum CodingKeys: String, CodingKey {
+        case models = "Search"
     }
     
 }

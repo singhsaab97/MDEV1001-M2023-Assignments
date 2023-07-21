@@ -30,8 +30,8 @@ private extension MoviesViewController {
     
     func setup() {
         navigationItem.title = viewModel?.title
-        setupSearchBar()
         setupCollectionView()
+        setupSearchBar()
         viewModel?.screenDidLoad()
     }
     
@@ -39,12 +39,13 @@ private extension MoviesViewController {
         let searchController = UISearchController()
         searchController.searchBar.tintColor = Color.secondaryLabel.shade
         searchController.delegate = self
-        searchController.searchBar.delegate = self
         navigationItem.searchController = searchController
+        viewModel?.listenToSearchQuery(with: searchController.searchBar.rx.text)
     }
     
     func setupCollectionView() {
         MovieCollectionViewCell.register(for: collectionView)
+        EmptyCollectionViewCell.register(for: collectionView)
     }
     
 }
@@ -53,16 +54,7 @@ private extension MoviesViewController {
 extension MoviesViewController: UISearchControllerDelegate {
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-//        viewModel?.cancelSearchButtonTapped()
-    }
-    
-}
-
-// MARK: - UISearchBarDelegate Methods
-extension MoviesViewController: UISearchBarDelegate {
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        viewModel?.didTypeSearchText(searchText)
+        viewModel?.cancelSearchButtonTapped()
     }
     
 }
@@ -76,11 +68,25 @@ extension MoviesViewController: UICollectionViewDelegate {
 extension MoviesViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return viewModel?.movies.count ?? 0
+        guard let movies = viewModel?.movies else { return 0 }
+        return movies.isEmpty ? 1 : movies.count // Empty cell
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cellViewModel = viewModel?.getCellViewModel(at: indexPath) else { return UICollectionViewCell() }
+        guard let viewModel = viewModel else { return UICollectionViewCell() }
+        if viewModel.movies.isEmpty,
+           let cellViewModel = viewModel.getEmptyCellViewModel(
+            at: indexPath,
+            with: navigationItem.searchController?.searchBar.text
+           ) {
+            let emptyCell = EmptyCollectionViewCell.dequeCell(
+                from: collectionView,
+                at: indexPath
+            )
+            emptyCell.configure(with: cellViewModel)
+            return emptyCell
+        }
+        guard let cellViewModel = viewModel.getMovieCellViewModel(at: indexPath) else { return UICollectionViewCell() }
         let movieCell = MovieCollectionViewCell.dequeCell(
             from: collectionView,
             at: indexPath
@@ -95,9 +101,21 @@ extension MoviesViewController: UICollectionViewDataSource {
 extension MoviesViewController: UICollectionViewDelegateFlowLayout {
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        guard let viewModel = viewModel,
-              let cellViewModel = viewModel.getCellViewModel(at: indexPath) else { return CGSize() }
+        guard let viewModel = viewModel else { return CGSize() }
         var cellWidth = collectionView.bounds.width - 2 * 20 // Horizontal section inset
+        if viewModel.movies.isEmpty {
+            guard let cellViewModel = viewModel.getEmptyCellViewModel(
+                at: indexPath,
+                with: navigationItem.searchController?.searchBar.text
+            ) else { return CGSize() }
+            var cellHeight = EmptyCollectionViewCell.calculateHeight(
+                with: cellViewModel,
+                width: cellWidth
+            )
+            cellHeight = collectionView.bounds.height - cellHeight / 2
+            return CGSize(width: cellWidth, height: cellHeight)
+        }
+        guard let cellViewModel = viewModel.getMovieCellViewModel(at: indexPath) else { return CGSize() }
         cellWidth = (cellWidth - 20) / CGFloat(viewModel.cellsPerRow) // Minimum line spacing
         let cellHeight = MovieCollectionViewCell.calculateHeight(
             with: cellViewModel,
@@ -121,8 +139,10 @@ extension MoviesViewController: MoviesViewModelPresenter {
         spinnerView.isHidden = true
     }
     
-    func reload() {
-        collectionView.reloadData()
+    func reloadSections(_ sections: IndexSet) {
+        collectionView.performBatchUpdates { [weak self] in
+            self?.collectionView.reloadSections(sections)
+        }
     }
     
 }
