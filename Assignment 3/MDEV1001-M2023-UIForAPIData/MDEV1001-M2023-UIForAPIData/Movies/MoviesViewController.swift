@@ -62,6 +62,10 @@ extension MoviesViewController: UISearchControllerDelegate {
 // MARK: - UICollectionViewDelegate Methods
 extension MoviesViewController: UICollectionViewDelegate {
     
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        viewModel?.didScroll(with: scrollView)
+    }
+    
 }
 
 // MARK: - UICollectionViewDataSource Methods
@@ -75,10 +79,7 @@ extension MoviesViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let viewModel = viewModel else { return UICollectionViewCell() }
         if viewModel.movies.isEmpty,
-           let cellViewModel = viewModel.getEmptyCellViewModel(
-            at: indexPath,
-            with: navigationItem.searchController?.searchBar.text
-           ) {
+           let cellViewModel = viewModel.getEmptyCellViewModel(at: indexPath) {
             let emptyCell = EmptyCollectionViewCell.dequeCell(
                 from: collectionView,
                 at: indexPath
@@ -104,10 +105,7 @@ extension MoviesViewController: UICollectionViewDelegateFlowLayout {
         guard let viewModel = viewModel else { return CGSize() }
         var cellWidth = collectionView.bounds.width - 2 * 20 // Horizontal section inset
         if viewModel.movies.isEmpty {
-            guard let cellViewModel = viewModel.getEmptyCellViewModel(
-                at: indexPath,
-                with: navigationItem.searchController?.searchBar.text
-            ) else { return CGSize() }
+            guard let cellViewModel = viewModel.getEmptyCellViewModel(at: indexPath) else { return CGSize() }
             var cellHeight = EmptyCollectionViewCell.calculateHeight(
                 with: cellViewModel,
                 width: cellWidth
@@ -128,6 +126,10 @@ extension MoviesViewController: UICollectionViewDelegateFlowLayout {
 
 // MARK: - MoviesViewModelPresenter Methods
 extension MoviesViewController: MoviesViewModelPresenter {
+    
+    var searchQuery: String? {
+        return navigationItem.searchController?.searchBar.text
+    }
     
     func startLoading() {
         spinnerView.isHidden = false

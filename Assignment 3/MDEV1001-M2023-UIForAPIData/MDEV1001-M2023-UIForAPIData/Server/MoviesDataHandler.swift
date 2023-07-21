@@ -13,18 +13,22 @@ typealias MoviesDataFetchCompletion = (MoviesResultState) -> Void
 enum MoviesResultState {
     case loading
     case data([Movie])
-    case error(Error)
+    case error(String?)
 }
 
 final class MoviesDataHandler {
     
     static let shared = MoviesDataHandler()
     
+    private(set) var totalMovies: Int
+    
     private lazy var apiClient: MoyaProvider<MoviesApiConstructor> = {
         return MoyaProvider<MoviesApiConstructor>()
     }()
     
-    private init() {}
+    private init() {
+        self.totalMovies = 0
+    }
     
 }
 
@@ -41,10 +45,11 @@ extension MoviesDataHandler {
     
     func fetchMovieSearchResults(
         for query: String,
+        page: Int,
         completion: @escaping MoviesDataFetchCompletion
     ) {
         completion(.loading)
-        apiClient.request(.movieSearchResults(query: query)) { result in
+        apiClient.request(.movieSearchResults(query: query, page: page)) { [weak self] result in
             switch result {
             case let .success(response):
                 do {
@@ -54,16 +59,18 @@ extension MoviesDataHandler {
                     ) as? [String: Any]
                     guard let searchResults = json?["Search"] as? [[String: Any]] else {
                         completion(.data([]))
+                        completion(.error(json?["Error"] as? String))
                         return
                     }
+                    self?.totalMovies = Int(json?["totalResults"] as? String ?? String()) ?? 0
                     let result = try JSONSerialization.data(withJSONObject: searchResults)
                     let models = try JSONDecoder().decode([Movie].self, from: result)
                     completion(.data(models))
                 } catch {
-                    completion(.error(error))
+                    completion(.error(error.localizedDescription))
                 }
             case let .failure(error):
-                completion(.error(error))
+                completion(.error(error.localizedDescription))
             }
         }
     }

@@ -56,12 +56,3 @@ struct Movie: Codable {
     }
     
 }
-
-struct MovieSearchResult: Codable {
-    let models: [Movie]
-    
-    private enum CodingKeys: String, CodingKey {
-        case models = "Search"
-    }
-    
-}

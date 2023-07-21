@@ -9,7 +9,7 @@ import Foundation
 import Moya
 
 enum MoviesApiConstructor {
-    case movieSearchResults(query: String?)
+    case movieSearchResults(query: String?, page: Int)
 }
 
 // MARK: - TargetType Conformation
@@ -38,9 +38,10 @@ extension MoviesApiConstructor: TargetType {
     
     var task: Moya.Task {
         switch self {
-        case let .movieSearchResults(query):
+        case let .movieSearchResults(query, page):
             var parameters = [String: Any]()
             parameters["apikey"] = Constants.apiKey
+            parameters["page"] = page
             if let query = query {
                 parameters["s"] = query
             }
