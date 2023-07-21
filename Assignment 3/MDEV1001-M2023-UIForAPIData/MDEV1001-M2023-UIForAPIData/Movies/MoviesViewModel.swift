@@ -16,6 +16,7 @@ protocol MoviesViewModelPresenter: AnyObject {
 protocol MoviesViewModelable {
     var title: String { get }
     var movies: [Movie] { get }
+    var cellsPerRow: Int { get }
     var presenter: MoviesViewModelPresenter? { get set }
     func screenDidLoad()
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
@@ -40,12 +41,16 @@ extension MoviesViewModel {
         return Constants.movies
     }
     
+    var cellsPerRow: Int {
+        return Constants.movieCellsPerRow
+    }
+    
     func screenDidLoad() {
         fetchMovies()
     }
     
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable? {
-        guard let movie = movies[safe: indexPath.row] else { return nil }
+        guard let movie = movies[safe: indexPath.item] else { return nil }
         return MovieCellViewModel(movie: movie)
     }
     

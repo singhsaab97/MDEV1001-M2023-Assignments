@@ -8,14 +8,14 @@
 import UIKit
 
 protocol MovieCellViewModelable {
-    var movie: Movie { get }
-    var ratingImage: UIImage? { get }
-    var durationImage: UIImage? { get }
+    var posterUrl: URL? { get }
+    var title: String { get }
+    var typeAndYear: String { get }
 }
 
 final class MovieCellViewModel: MovieCellViewModelable {
     
-    let movie: Movie
+    private let movie: Movie
     
     init(movie: Movie) {
         self.movie = movie
@@ -26,12 +26,16 @@ final class MovieCellViewModel: MovieCellViewModelable {
 // MARK: - Exposed Helpers
 extension MovieCellViewModel {
     
-    var ratingImage: UIImage? {
-        return UIImage(named: "star")
+    var posterUrl: URL? {
+        return movie.posterUrl
     }
     
-    var durationImage: UIImage? {
-        return UIImage(named: "clock")
+    var title: String {
+        return movie.title
+    }
+    
+    var typeAndYear: String {
+        return "\(movie.type.rawValue.capitalizedInitial)  •  \(movie.year)"
     }
    
 }

@@ -6,3 +6,18 @@
 //
 
 import Foundation
+
+struct Constants {
+    
+    static let baseApiUrl = URL(string: "https://www.omdbapi.com")
+    static let apiKey = "92300c89"
+    static let commonApiHeaders = ["Content-Type": "application/json"]
+    
+    static let movies = "Movies"
+    static let movieCellsPerRow: Int = 2
+    
+    static let storyboardName = "Main"
+    static let moviesViewController = String(describing: MoviesViewController.self)
+    static let movieCollectionViewCell = String(describing: MovieCollectionViewCell.self)
+    
+}

@@ -61,7 +61,6 @@ private extension SceneDelegate {
         let navigationController = UINavigationController(rootViewController: viewController)
         navigationController.modalPresentationStyle = .fullScreen
         navigationController.modalPresentationCapturesStatusBarAppearance = true
-        navigationController.navigationBar.prefersLargeTitles = false
         navigationController.navigationBar.isTranslucent = true
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()

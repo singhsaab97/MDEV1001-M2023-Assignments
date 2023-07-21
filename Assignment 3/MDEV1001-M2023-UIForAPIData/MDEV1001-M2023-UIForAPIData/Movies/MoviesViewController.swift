@@ -11,10 +11,10 @@ final class MoviesViewController: UIViewController,
                                   ViewLoadable {
     
     static let name = Constants.storyboardName
-    static let identifier = Constants.moviesViewControllerIdentifier
+    static let identifier = Constants.moviesViewController
     
     @IBOutlet private weak var spinnerView: UIActivityIndicatorView!
-    @IBOutlet private weak var tableView: UITableView!
+    @IBOutlet private weak var collectionView: UICollectionView!
    
     var viewModel: MoviesViewModelable?
 
@@ -31,7 +31,7 @@ private extension MoviesViewController {
     func setup() {
         navigationItem.title = viewModel?.title
         setupSearchBar()
-        setupTableView()
+        setupCollectionView()
         viewModel?.screenDidLoad()
     }
     
@@ -43,8 +43,8 @@ private extension MoviesViewController {
         navigationItem.searchController = searchController
     }
     
-    func setupTableView() {
-        MovieTableViewCell.register(for: tableView)
+    func setupCollectionView() {
+        MovieCollectionViewCell.register(for: collectionView)
     }
     
 }
@@ -67,23 +67,43 @@ extension MoviesViewController: UISearchBarDelegate {
     
 }
 
-// MARK: - UITableViewDelegate Methods
-extension MoviesViewController: UITableViewDelegate {
+// MARK: - UICollectionViewDelegate Methods
+extension MoviesViewController: UICollectionViewDelegate {
     
 }
 
-// MARK: - UITableViewDataSource Methods
-extension MoviesViewController: UITableViewDataSource {
+// MARK: - UICollectionViewDataSource Methods
+extension MoviesViewController: UICollectionViewDataSource {
     
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewModel?.movies.count ?? 0
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cellViewModel = viewModel?.getCellViewModel(at: indexPath) else { return UITableViewCell() }
-        let movieCell = MovieTableViewCell.dequeCell(from: tableView, at: indexPath)
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cellViewModel = viewModel?.getCellViewModel(at: indexPath) else { return UICollectionViewCell() }
+        let movieCell = MovieCollectionViewCell.dequeCell(
+            from: collectionView,
+            at: indexPath
+        )
         movieCell.configure(with: cellViewModel)
         return movieCell
+    }
+    
+}
+
+// MARK: - UICollectionViewDataSource Methods
+extension MoviesViewController: UICollectionViewDelegateFlowLayout {
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        guard let viewModel = viewModel,
+              let cellViewModel = viewModel.getCellViewModel(at: indexPath) else { return CGSize() }
+        var cellWidth = collectionView.bounds.width - 2 * 20 // Horizontal section inset
+        cellWidth = (cellWidth - 20) / CGFloat(viewModel.cellsPerRow) // Minimum line spacing
+        let cellHeight = MovieCollectionViewCell.calculateHeight(
+            with: cellViewModel,
+            width: cellWidth
+        )
+        return CGSize(width: cellWidth, height: cellHeight)
     }
     
 }
@@ -102,7 +122,7 @@ extension MoviesViewController: MoviesViewModelPresenter {
     }
     
     func reload() {
-        tableView.reloadData()
+        collectionView.reloadData()
     }
     
 }

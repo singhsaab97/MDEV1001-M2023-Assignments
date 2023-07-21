@@ -18,7 +18,7 @@ extension MoviesApiConstructor: TargetType {
     var baseURL: URL {
         switch self {
         case .movieSearchResults:
-            return Constants.baseApiURL!
+            return Constants.baseApiUrl!
         }
     }
     
