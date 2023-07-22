@@ -28,7 +28,7 @@ final class EmptyCellViewModel: EmptyCellViewModelable {
 extension EmptyCellViewModel {
     
     var emptyImage: UIImage? {
-        return UIImage(named: "empty.movies")
+        return UIImage(named: "emptyMovies")
     }
     
     var title: String {

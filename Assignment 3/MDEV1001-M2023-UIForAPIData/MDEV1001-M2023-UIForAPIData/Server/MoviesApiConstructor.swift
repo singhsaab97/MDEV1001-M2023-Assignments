@@ -9,7 +9,8 @@ import Foundation
 import Moya
 
 enum MoviesApiConstructor {
-    case movieSearchResults(query: String?, page: Int)
+    case movie(id: String)
+    case movieSearchResults(query: String, page: Int)
 }
 
 // MARK: - TargetType Conformation
@@ -17,40 +18,44 @@ extension MoviesApiConstructor: TargetType {
     
     var baseURL: URL {
         switch self {
-        case .movieSearchResults:
+        case .movie, .movieSearchResults:
             return Constants.baseApiUrl!
         }
     }
     
     var path: String {
         switch self {
-        case .movieSearchResults:
+        case .movie, .movieSearchResults:
             return String()
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .movieSearchResults:
+        case .movie, .movieSearchResults:
             return .get
         }
     }
     
     var task: Moya.Task {
+        var parameters = [String: Any]()
+        parameters["apikey"] = Constants.apiKey
         switch self {
+        case let .movie(id):
+            parameters["i"] = id
+            parameters["plot"] = Constants.fullPlotParameter
         case let .movieSearchResults(query, page):
-            var parameters = [String: Any]()
-            parameters["apikey"] = Constants.apiKey
+            parameters["s"] = query
             parameters["page"] = page
-            if let query = query {
-                parameters["s"] = query
-            }
-            return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         }
+        return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
     }
     
     var headers: [String : String]? {
-        return Constants.commonApiHeaders
+        switch self {
+        case .movie, .movieSearchResults:
+            return Constants.commonApiHeaders
+        }
     }
     
 }

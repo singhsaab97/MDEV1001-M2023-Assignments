@@ -43,6 +43,23 @@ extension MoviesDataHandler {
         completion(.data(models))
     }
     
+    func fetchMovie(with id: String, completion: @escaping MoviesDataFetchCompletion) {
+        completion(.loading)
+        apiClient.request(.movie(id: id)) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let model = try JSONDecoder().decode(Movie.self, from: response.data)
+                    completion(.data([model]))
+                } catch {
+                    completion(.error(error.localizedDescription))
+                }
+            case let .failure(error):
+                completion(.error(error.localizedDescription))
+            }
+        }
+    }
+    
     func fetchMovieSearchResults(
         for query: String,
         page: Int,

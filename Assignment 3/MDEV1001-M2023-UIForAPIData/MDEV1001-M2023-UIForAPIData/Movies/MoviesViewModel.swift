@@ -14,6 +14,7 @@ protocol MoviesViewModelPresenter: AnyObject {
     func startLoading()
     func stopLoading()
     func reloadSections(_ sections: IndexSet)
+    func present(_ viewController: UIViewController)
 }
 
 protocol MoviesViewModelable {
@@ -25,6 +26,7 @@ protocol MoviesViewModelable {
     func getMovieCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
     func getEmptyCellViewModel(at indexPath: IndexPath) -> EmptyCellViewModelable?
     func didScroll(with scrollView: UIScrollView)
+    func didSelectCell(at indexPath: IndexPath)
     func listenToSearchQuery(with searchText: ControlProperty<String?>)
     func cancelSearchButtonTapped()
 }
@@ -93,6 +95,17 @@ extension MoviesViewModel {
               scrollOffset + scrollViewHeight >= scrollContentSizeHeight - Constants.scrollThreshold else { return }
         currentPage += 1
         fetchMovies(for: currentPage)
+    }
+    
+    func didSelectCell(at indexPath: IndexPath) {
+        guard let movie = movies[safe: indexPath.item],
+              let movieId = movie.id else { return }
+        let viewModel = MovieDetailsViewModel(movieId: movieId)
+        let viewController = MovieDetailsViewController.loadFromStoryboard()
+        viewController.viewModel = viewModel
+        viewModel.presenter = viewController
+        viewController.modalPresentationStyle = .fullScreen
+        presenter?.present(viewController)
     }
     
     func listenToSearchQuery(with searchText: ControlProperty<String?>) {

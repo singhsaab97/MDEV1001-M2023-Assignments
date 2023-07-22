@@ -65,6 +65,59 @@
             </objects>
             <point key="canvasLocation" x="46.564885496183201" y="-2.1126760563380285"/>
         </scene>
+        <!--Movie Details View Controller-->
+        <scene sceneID="Adr-IT-VY2">
+            <objects>
+                <viewController storyboardIdentifier="MovieDetailsViewController" id="ZbL-0n-2nD" customClass="MovieDetailsViewController" customModule="MDEV1001_M2023_UIForAPIData" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="PA2-yg-x4Q">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <activityIndicatorView hidden="YES" opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" hidesWhenStopped="YES" style="medium" id="MXq-5e-5GI">
+                                <rect key="frame" x="0.0" y="404" width="393" height="44"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" contentInsetAdjustmentBehavior="never" dataMode="prototypes" style="plain" separatorStyle="none" allowsSelection="NO" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="ZYk-xf-8Sr">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="ZbL-0n-2nD" id="hPf-Kq-Fo2"/>
+                                    <outlet property="delegate" destination="ZbL-0n-2nD" id="gJ7-mE-fzh"/>
+                                </connections>
+                            </tableView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="eWo-sC-KPW">
+                                <rect key="frame" x="20" y="59" width="32" height="32"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" secondItem="eWo-sC-KPW" secondAttribute="height" id="Da1-ov-PI4"/>
+                                    <constraint firstAttribute="width" constant="32" id="hXE-xn-GRB"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <connections>
+                                    <action selector="closeButtonTapped" destination="ZbL-0n-2nD" eventType="touchUpInside" id="NNE-F9-W2I"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="TMG-st-oMc"/>
+                        <color key="backgroundColor" name="background"/>
+                        <constraints>
+                            <constraint firstItem="TMG-st-oMc" firstAttribute="trailing" secondItem="ZYk-xf-8Sr" secondAttribute="trailing" id="FV3-Pj-Dl6"/>
+                            <constraint firstItem="eWo-sC-KPW" firstAttribute="top" secondItem="TMG-st-oMc" secondAttribute="top" id="GHd-gs-cR8"/>
+                            <constraint firstItem="ZYk-xf-8Sr" firstAttribute="top" secondItem="PA2-yg-x4Q" secondAttribute="top" id="Wam-56-LFt"/>
+                            <constraint firstAttribute="bottom" secondItem="ZYk-xf-8Sr" secondAttribute="bottom" id="bRq-Pc-TBp"/>
+                            <constraint firstItem="eWo-sC-KPW" firstAttribute="leading" secondItem="TMG-st-oMc" secondAttribute="leading" constant="20" id="faA-14-da2"/>
+                            <constraint firstItem="ZYk-xf-8Sr" firstAttribute="leading" secondItem="TMG-st-oMc" secondAttribute="leading" id="roP-Ro-yhz"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="closeButton" destination="eWo-sC-KPW" id="VXd-z6-t6f"/>
+                        <outlet property="spinnerView" destination="MXq-5e-5GI" id="jXz-0g-RwI"/>
+                        <outlet property="tableView" destination="ZYk-xf-8Sr" id="iRA-lW-4Qp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="wjX-qW-XTd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="746" y="-2"/>
+        </scene>
     </scenes>
     <resources>
         <namedColor name="background">

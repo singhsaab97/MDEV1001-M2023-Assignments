@@ -14,6 +14,7 @@ enum MovieType: String, Codable {
 }
 
 struct Movie: Codable {
+    let id: String?
     let title: String?
     let year: String?
     let rated: String?
@@ -37,6 +38,7 @@ struct Movie: Codable {
     }
     
     private enum CodingKeys: String, CodingKey {
+        case id = "imdbID"
         case title = "Title"
         case year = "Year"
         case rated = "Rated"

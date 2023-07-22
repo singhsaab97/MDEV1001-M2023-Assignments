@@ -66,6 +66,10 @@ extension MoviesViewController: UICollectionViewDelegate {
         viewModel?.didScroll(with: scrollView)
     }
     
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        viewModel?.didSelectCell(at: indexPath)
+    }
+    
 }
 
 // MARK: - UICollectionViewDataSource Methods
@@ -145,6 +149,10 @@ extension MoviesViewController: MoviesViewModelPresenter {
         collectionView.performBatchUpdates { [weak self] in
             self?.collectionView.reloadSections(sections)
         }
+    }
+    
+    func present(_ viewController: UIViewController) {
+        navigationController?.present(viewController, animated: true)
     }
     
 }
