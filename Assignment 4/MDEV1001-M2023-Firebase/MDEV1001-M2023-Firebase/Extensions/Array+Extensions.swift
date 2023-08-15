@@ -22,3 +22,17 @@ extension Array where Element == String {
     }
     
 }
+
+extension Array where Element: Equatable {
+    
+    var removedDuplicates: [Element] {
+        var results = [Element]()
+        for value in self {
+            if !results.contains(value) {
+                results.append(value)
+            }
+        }
+        return results
+    }
+    
+}

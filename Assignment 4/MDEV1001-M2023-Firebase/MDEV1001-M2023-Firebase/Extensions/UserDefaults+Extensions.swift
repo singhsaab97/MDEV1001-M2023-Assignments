@@ -18,8 +18,8 @@ extension UserDefaults {
         return UIUserInterfaceStyle(rawValue: value) ?? .unspecified
     }
     
-    static var availablePosters: [URL?] {
-        return appSuite.array(forKey: availablePostersKey) as? [URL?] ?? []
+    static var availablePosters: [String] {
+        return appSuite.array(forKey: availablePostersKey) as? [String] ?? []
     }
     
 }

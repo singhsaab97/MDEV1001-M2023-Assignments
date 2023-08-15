@@ -46,3 +46,24 @@ struct Movie: Codable, Equatable {
     }
     
 }
+
+// MARK: - Exposed Helpers
+extension Movie {
+    
+    static func createObject(with id: Int) -> Movie {
+        return Movie(
+            id: id,
+            title: String(),
+            studio: String(),
+            genres: [],
+            directors: [],
+            writers: [],
+            actors: [],
+            year: 0,
+            runtime: 0,
+            contentRating: String(),
+            criticsRating: .zero
+        )
+    }
+    
+}

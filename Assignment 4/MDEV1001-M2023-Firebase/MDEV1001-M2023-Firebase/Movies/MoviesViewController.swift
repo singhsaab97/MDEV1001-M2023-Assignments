@@ -16,6 +16,15 @@ final class MoviesViewController: UIViewController,
     @IBOutlet private weak var tableView: UITableView!
     @IBOutlet private weak var spinnerView: UIActivityIndicatorView!
     
+    private lazy var themeButton: UIBarButtonItem = {
+        return UIBarButtonItem(
+            image: viewModel?.userInterfaceStyle.image,
+            style: .plain,
+            target: self,
+            action: #selector(themeButtonTapped)
+        )
+    }()
+    
     var viewModel: MoviesViewModelable?
     
     override func viewDidLoad() {
@@ -34,18 +43,26 @@ final class MoviesViewController: UIViewController,
 private extension MoviesViewController {
     
     func setup() {
-        addAddButton()
+        addActionButtons()
         MovieTableViewCell.register(for: tableView)
         viewModel?.screenLoaded()
     }
     
-    func addAddButton() {
+    func addActionButtons() {
+        // Theme button
+        navigationItem.leftBarButtonItem = themeButton
+        // Add button
         let addButton = UIBarButtonItem(
             barButtonSystemItem: .add,
             target: self,
             action: #selector(addButtonTapped)
         )
         navigationItem.rightBarButtonItem = addButton
+    }
+    
+    @objc
+    func themeButtonTapped() {
+        viewModel?.themeButtonTapped()
     }
     
     @objc
@@ -96,6 +113,10 @@ extension MoviesViewController: MoviesPresenter {
     
     func setNavigationTitle(_ title: String) {
         navigationItem.title = title
+    }
+    
+    func setThemeButton(with image: UIImage?) {
+        themeButton.image = image
     }
     
     func startLoading() {

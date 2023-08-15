@@ -172,52 +172,52 @@ extension AddEditMovieViewModel {
 private extension AddEditMovieViewModel {
     
     func setup() {
-        // Initialize updatedMovie with the current movie
         switch mode {
         case let .add(id):
-            updatedMovie?.id = id
+            updatedMovie = Movie.createObject(with: id)
         case let .edit(movie):
             updatedMovie = movie
         }
     }
     
     func validateMovieEntry() -> Bool {
+        guard let movie = updatedMovie else { return false }
         // Validate mandatory fields
         let mandatoryFields = Field.allCases.filter { $0.isMandatory }
         for field in mandatoryFields {
             switch field {
             case .title:
-                guard updatedMovie?.title == nil else { continue }
+                guard movie.title.isEmpty else { continue }
                 return showError(for: field)
             case .studio:
-                guard updatedMovie?.studio == nil else { continue }
+                guard movie.studio.isEmpty else { continue }
                 return showError(for: field)
             case .genres:
-                guard updatedMovie?.genres == nil else { continue }
+                guard movie.genres.isEmpty else { continue }
                 return showError(for: field)
             case .directors:
-                guard updatedMovie?.directors == nil else { continue }
+                guard movie.directors.isEmpty else { continue }
                 return showError(for: field)
             case .writers:
-                guard updatedMovie?.writers == nil else { continue }
+                guard movie.writers.isEmpty else { continue }
                 return showError(for: field)
             case .actors:
-                guard updatedMovie?.actors == nil else { continue }
+                guard movie.actors.isEmpty else { continue }
                 return showError(for: field)
             case .year:
-                guard updatedMovie?.year == nil else { continue }
+                guard movie.year == 0 else { continue }
                 return showError(for: field)
             case .length:
-                guard updatedMovie?.runtime == nil else { continue }
+                guard movie.runtime == 0 else { continue }
                 return showError(for: field)
             case .mpaRating:
-                guard updatedMovie?.contentRating == nil else { continue }
+                guard movie.contentRating.isEmpty else { continue }
                 return showError(for: field)
             case .criticsRating:
-                guard updatedMovie?.criticsRating == nil else { continue }
+                guard movie.criticsRating.isZero else { continue }
                 return showError(for: field)
             case .description:
-                guard updatedMovie?.summary == nil else { continue }
+                guard movie.summary == nil else { continue }
                 return showError(for: field)
             }
         }

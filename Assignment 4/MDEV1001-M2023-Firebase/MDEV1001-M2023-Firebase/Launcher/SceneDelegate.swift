@@ -17,9 +17,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // If using a storyboard, the `window` property will automatically be initialized and attached to the scene.
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let scene = scene as? UIWindowScene else { return }
-        setupFirebase()
         window = UIWindow(windowScene: scene)
-        launch()
+        setup()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -55,13 +54,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 // MARK: - Private Helpers
 private extension SceneDelegate {
     
-    func setupFirebase() {
+    func setup() {
         FirebaseApp.configure()
+        setUserInterfaceStyle(with: UserDefaults.userInterfaceStyle)
+        launch()
+    }
+    
+    func setUserInterfaceStyle(with style: UIUserInterfaceStyle) {
+        window?.overrideUserInterfaceStyle = style
     }
     
     func launch() {
         let viewController = MoviesViewController.loadFromStoryboard()
-        let viewModel = MoviesViewModel()
+        let viewModel = MoviesViewModel(listener: self)
         viewController.viewModel = viewModel
         viewModel.presenter = viewController
         let navigationController = UINavigationController(rootViewController: viewController)
@@ -71,6 +76,18 @@ private extension SceneDelegate {
         navigationController.navigationBar.isTranslucent = true
         window?.rootViewController = navigationController
         window?.makeKeyAndVisible()
+    }
+    
+}
+
+// MARK: - MoviesListener Methods
+extension SceneDelegate: MoviesListener {
+    
+    func changeTheme(to style: UIUserInterfaceStyle) {
+        guard let view = window else { return }
+        UIView.transition(with: view, duration: Constants.animationDuration) { [weak self] in
+            self?.setUserInterfaceStyle(with: style)
+        }
     }
     
 }

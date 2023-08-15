@@ -7,8 +7,13 @@
 
 import UIKit
 
+protocol MoviesListener: AnyObject {
+    func changeTheme(to style: UIUserInterfaceStyle)
+}
+
 protocol MoviesPresenter: AnyObject {
     func setNavigationTitle(_ title: String)
+    func setThemeButton(with image: UIImage?)
     func startLoading()
     func stopLoading()
     func reloadSections(_ indexSet: IndexSet)
@@ -21,10 +26,12 @@ protocol MoviesPresenter: AnyObject {
 }
 
 protocol MoviesViewModelable {
+    var userInterfaceStyle: UIUserInterfaceStyle { get }
     var numberOfMovies: Int { get }
     var presenter: MoviesPresenter? { get set }
     func screenWillAppear()
     func screenLoaded()
+    func themeButtonTapped()
     func addButtonTapped()
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
     func didSelectMovie(at indexPath: IndexPath)
@@ -35,17 +42,23 @@ protocol MoviesViewModelable {
 final class MoviesViewModel: MoviesViewModelable {
     
     private var movies: [Movie]
+    private weak var listener: MoviesListener?
        
     weak var presenter: MoviesPresenter?
     
-    init() {
+    init(listener: MoviesListener?) {
         self.movies = []
+        self.listener = listener
     }
     
 }
 
 // MARK: - Exposed Helpers
 extension MoviesViewModel {
+    
+    var userInterfaceStyle: UIUserInterfaceStyle {
+        return UserDefaults.userInterfaceStyle
+    }
     
     var numberOfMovies: Int {
         return movies.count
@@ -57,6 +70,13 @@ extension MoviesViewModel {
     
     func screenLoaded() {
         fetchMovies()
+    }
+    
+    func themeButtonTapped() {
+        let newStyle = userInterfaceStyle.overridingStyle
+        presenter?.setThemeButton(with: newStyle.image)
+        listener?.changeTheme(to: newStyle)
+        UserDefaults.appSuite.set(newStyle.rawValue, forKey: UserDefaults.userInterfaceStyleKey)
     }
     
     func addButtonTapped() {
@@ -101,6 +121,12 @@ private extension MoviesViewModel {
             self?.presenter?.stopLoading()
             guard let error = error else {
                 self?.movies = movies
+                // Save poster urls
+                let availablePosters = UserDefaults.appSuite.array(forKey: UserDefaults.availablePostersKey)
+                if availablePosters == nil {
+                    let posters = movies.map { $0.poster }.removedDuplicates
+                    UserDefaults.appSuite.set(posters, forKey: UserDefaults.availablePostersKey)
+                }
                 self?.presenter?.reloadSections(IndexSet(integer: 0))
                 return
             }
@@ -129,7 +155,7 @@ private extension MoviesViewModel {
     }
     
     func showAddEditViewController(for mode: AddEditMovieViewModel.Mode) {
-        let posters = movies.map { $0.posterUrl }
+        let posters = UserDefaults.availablePosters.map { $0.toUrl }
         let viewModel = AddEditMovieViewModel(
             mode: mode,
             posters: posters,
@@ -199,8 +225,40 @@ extension MoviesViewModel: AddEditMovieListener {
     
     func doesMovieExist(_ movie: Movie?) -> Bool {
         return movies.contains(where: {
-            return $0.title == movie?.title && $0.studio == movie?.studio
+            return $0.title == movie?.title
+                && $0.studio == movie?.studio
+                && $0.year == movie?.year
+                && $0.runtime == movie?.runtime
+                && $0.criticsRating == movie?.criticsRating
+                && $0.poster == movie?.poster
         })
     }
 
+}
+
+// MARK: - UIUserInterfaceStyle Helpers
+extension UIUserInterfaceStyle {
+    
+    var image: UIImage? {
+        switch self {
+        case .light:
+            return UIImage(systemName: "sun.max")
+        case .dark:
+            return UIImage(systemName: "moon")
+        default:
+            return UIImage(systemName: "iphone.gen2")
+        }
+    }
+    
+    var overridingStyle: UIUserInterfaceStyle {
+        switch self {
+        case .light:
+            return .dark
+        case .dark:
+            return .unspecified
+        default:
+            return .light
+        }
+    }
+    
 }

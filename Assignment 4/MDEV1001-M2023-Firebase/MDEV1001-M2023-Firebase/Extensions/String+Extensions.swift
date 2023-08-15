@@ -14,4 +14,8 @@ extension String {
         return components(separatedBy: ",").map { $0.trimmingCharacters(in: .whitespaces) }
     }
     
+    var toUrl: URL? {
+        return URL(string: self)
+    }
+    
 }
