@@ -18,12 +18,11 @@ final class UsersDataHandler {
     
     private let collection: CollectionReference
     
-    private(set) var userEmails: [String]
+    private var userEmails: [String]
         
     private init() {
         self.collection = Firestore.firestore().collection(Constants.usersCollectionName)
         self.userEmails = []
-        fetchUsers()
     }
         
 }
@@ -31,15 +30,27 @@ final class UsersDataHandler {
 // MARK: - Exposed Helpers
 extension UsersDataHandler {
     
+    func fetchUsers() {
+        collection.getDocuments { [weak self] (snapshot, error) in
+            guard error == nil else { return }
+            if let documents = snapshot?.documents {
+                documents.forEach { document in
+                    if let emailId = document.data()[Constants.userEmailIdCodingKey] as? String {
+                        self?.userEmails.append(emailId)
+                    }
+                }
+            }
+        }
+    }
+    
     func signUp(with username: String, emailId: String, password: String, completion: @escaping UsersDefaultCompletion) {
-        Auth.auth().createUser(withEmail: emailId, password: password) { [weak self] (result, error) in
+        guard !userEmails.contains(emailId) else {
+            completion(Constants.registrationFailedMessage)
+            return
+        }
+        Auth.auth().createUser(withEmail: emailId, password: password) { [weak self] (_, error) in
             if let error = error {
                 completion(error.localizedDescription)
-            }
-            guard result?.user != nil else {
-                // Unexpected scenario where user is nil
-                completion(nil)
-                return
             }
             let data = [Constants.userEmailIdCodingKey: emailId]
             self?.collection.document(username).setData(data) { error in
@@ -67,24 +78,6 @@ extension UsersDataHandler {
                 }
             } else {
                 completion(Constants.authenticationFailedMessage)
-            }
-        }
-    }
-    
-}
-
-// MARK: - Private Helpers
-private extension UsersDataHandler {
-    
-    func fetchUsers() {
-        collection.getDocuments { [weak self] (snapshot, error) in
-            guard error == nil else { return }
-            if let documents = snapshot?.documents {
-                documents.forEach { document in
-                    if let emailId = document.data()[Constants.userEmailIdCodingKey] as? String {
-                        self?.userEmails.append(emailId)
-                    }
-                }
             }
         }
     }

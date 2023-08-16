@@ -77,6 +77,7 @@ extension AuthenticationViewModel {
     
     func screenDidLoad() {
         setupProtectedFieldsHiddenDict()
+        UsersDataHandler.instance.fetchUsers()
     }
     
     func keyboardWillShow(with frame: CGRect) {
@@ -113,7 +114,6 @@ extension AuthenticationViewModel {
               let password = presenter?.userPassword else { return }
         switch flow {
         case .signUp:
-            guard !doesUserExist else { return }
             guard let emailId = presenter?.userEmail else { return }
             signUp(with: username, emailId: emailId, password: password)
         case .signIn:
@@ -139,15 +139,6 @@ extension AuthenticationViewModel {
 
 // MARK: - Private Helpers
 private extension AuthenticationViewModel {
-    
-    var doesUserExist: Bool {
-        guard let emailId = presenter?.userEmail,
-              !UsersDataHandler.instance.userEmails.contains(emailId) else {
-            showToast(with: Constants.authenticationFailedMessage)
-            return true
-        }
-        return false
-    }
     
     func setupProtectedFieldsHiddenDict() {
         flow.fields.forEach { field in
