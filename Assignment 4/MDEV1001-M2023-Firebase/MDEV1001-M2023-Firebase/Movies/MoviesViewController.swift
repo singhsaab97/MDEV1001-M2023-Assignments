@@ -49,8 +49,14 @@ private extension MoviesViewController {
     }
     
     func addActionButtons() {
-        // Theme button
-        navigationItem.leftBarButtonItem = themeButton
+        // Logout button
+        let logoutButton = UIBarButtonItem(
+            image: viewModel?.logoutButtonImage,
+            style: .plain,
+            target: self,
+            action: #selector(logoutButtonTapped)
+        )
+        navigationItem.leftBarButtonItems = [logoutButton, themeButton]
         // Add button
         let addButton = UIBarButtonItem(
             barButtonSystemItem: .add,
@@ -58,6 +64,11 @@ private extension MoviesViewController {
             action: #selector(addButtonTapped)
         )
         navigationItem.rightBarButtonItem = addButton
+    }
+    
+    @objc
+    func logoutButtonTapped() {
+        viewModel?.logoutButtonTapped()
     }
     
     @objc
@@ -159,6 +170,10 @@ extension MoviesViewController: MoviesPresenter {
     
     func push(_ viewController: UIViewController) {
         navigationController?.pushViewController(viewController, animated: true)
+    }
+    
+    func dismiss() {
+        navigationController?.dismiss(animated: true)
     }
     
 }

@@ -19,8 +19,11 @@ struct Constants {
     static let toastDisplayDuration: TimeInterval = 3
     
     static let suiteName = Bundle.main.infoDictionary!["CFBundleName"] as! String
+    static let usersCollectionName = "Users"
+    static let userEmailIdCodingKey = "email_id"
     static let moviesCollectionName = "Movies"
     static let storyboardName = "Main"
+    static let authenticationViewController = String(describing: AuthenticationViewController.self)
     static let moviesViewController = String(describing: MoviesViewController.self)
     static let movieCell = String(describing: MovieTableViewCell.self)
     static let addEditMovieViewController = String(describing: AddEditMovieViewController.self)
@@ -28,6 +31,25 @@ struct Constants {
     static let postersListCell = String(describing: PostersListTableViewCell.self)
     static let posterCell = String(describing: PosterCollectionViewCell.self)
     static let toastView = String(describing: ToastView.self)
+    
+    static let signUpTitle = "Create account"
+    static let signUpSubtitle = "Please fill your details in the form below"
+    static let signUpMessage = "Already have an account?"
+    static let signUp = "Sign Up"
+    static let signInTitle = "Welcome back"
+    static let signInSubtitle = "Please log in with your details below"
+    static let signInMessage = "Don't have an account?"
+    static let signIn = "Sign In"
+    static let nameFieldPlaceholder = "Full name"
+    static let usernameFieldPlaceholder = "Username"
+    static let emailFieldPlaceholder = "Email address"
+    static let confirmEmailFieldPlaceholder = "Confirm email address"
+    static let passwordFieldPlaceholder = "Password"
+    static let confirmPasswordFieldPlaceholder = "Confirm password"
+    static let emailRegex = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
+    static let registrationFailedMessage = "Registration failed"
+    static let authenticationFailedMessage = "Authentication failed"
+    
     
     static let moviesViewControllerTitle = "Favourite Movies"
     static let edit = "Edit"
@@ -49,6 +71,9 @@ struct Constants {
     static let movieExistsErrorMessage = "This movie already exists in the database"
     static let deleteAlertMessage = "This action will delete it from the database permanently."
     static let deleteAlertDeleteTitle = "Delete"
-    static let deleteAlertCancelTitle = "Cancel"
+    static let logoutAlertMessage = "You will have to sign in again once you log out."
+    static let logoutAlertTitle = "Logout?"
+    static let logoutAlertLogoutTitle = "Logout"
+    static let alertCancelTitle = "Cancel"
     
 }

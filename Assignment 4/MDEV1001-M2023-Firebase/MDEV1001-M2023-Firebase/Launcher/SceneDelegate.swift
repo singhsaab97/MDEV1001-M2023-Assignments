@@ -6,11 +6,14 @@
 //
 
 import UIKit
-import FirebaseCore
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
+    
+    private lazy var launcher: RootLauncher = {
+        return RootLauncher(window: window)
+    }()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -18,7 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let scene = scene as? UIWindowScene else { return }
         window = UIWindow(windowScene: scene)
-        setup()
+        launcher.launch()
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -49,45 +52,4 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-}
-
-// MARK: - Private Helpers
-private extension SceneDelegate {
-    
-    func setup() {
-        FirebaseApp.configure()
-        setUserInterfaceStyle(with: UserDefaults.userInterfaceStyle)
-        launch()
-    }
-    
-    func setUserInterfaceStyle(with style: UIUserInterfaceStyle) {
-        window?.overrideUserInterfaceStyle = style
-    }
-    
-    func launch() {
-        let viewController = MoviesViewController.loadFromStoryboard()
-        let viewModel = MoviesViewModel(listener: self)
-        viewController.viewModel = viewModel
-        viewModel.presenter = viewController
-        let navigationController = UINavigationController(rootViewController: viewController)
-        navigationController.modalPresentationStyle = .fullScreen
-        navigationController.modalPresentationCapturesStatusBarAppearance = true
-        navigationController.navigationBar.prefersLargeTitles = true
-        navigationController.navigationBar.isTranslucent = true
-        window?.rootViewController = navigationController
-        window?.makeKeyAndVisible()
-    }
-    
-}
-
-// MARK: - MoviesListener Methods
-extension SceneDelegate: MoviesListener {
-    
-    func changeTheme(to style: UIUserInterfaceStyle) {
-        guard let view = window else { return }
-        UIView.transition(with: view, duration: Constants.animationDuration) { [weak self] in
-            self?.setUserInterfaceStyle(with: style)
-        }
-    }
-    
 }

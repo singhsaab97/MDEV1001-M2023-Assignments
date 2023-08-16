@@ -41,6 +41,10 @@
 		7CAFB3E92A8B45A800D68F98 /* StretchyTableHeaderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3E82A8B45A800D68F98 /* StretchyTableHeaderView.swift */; };
 		7CAFB3EB2A8B46B100D68F98 /* UIViewController+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3EA2A8B46B100D68F98 /* UIViewController+Extensions.swift */; };
 		7CAFB3EF2A8BE9EF00D68F98 /* UserDefaults+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3EE2A8BE9EF00D68F98 /* UserDefaults+Extensions.swift */; };
+		7CAFB3F22A8C010800D68F98 /* AuthenticationViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3F12A8C010800D68F98 /* AuthenticationViewController.swift */; };
+		7CAFB3F42A8C011400D68F98 /* AuthenticationViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3F32A8C011400D68F98 /* AuthenticationViewModel.swift */; };
+		7CAFB3F72A8C0FB200D68F98 /* UsersDataHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3F62A8C0FB200D68F98 /* UsersDataHandler.swift */; };
+		7CAFB3FB2A8C621400D68F98 /* RootLauncher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CAFB3FA2A8C621400D68F98 /* RootLauncher.swift */; };
 		B389AD616CFC1D0EB4982E45 /* Pods_MDEV1001_M2023_Firebase.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 92442D3A6AA1AA5C3189EB99 /* Pods_MDEV1001_M2023_Firebase.framework */; };
 /* End PBXBuildFile section */
 
@@ -82,6 +86,10 @@
 		7CAFB3E82A8B45A800D68F98 /* StretchyTableHeaderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StretchyTableHeaderView.swift; sourceTree = "<group>"; };
 		7CAFB3EA2A8B46B100D68F98 /* UIViewController+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIViewController+Extensions.swift"; sourceTree = "<group>"; };
 		7CAFB3EE2A8BE9EF00D68F98 /* UserDefaults+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UserDefaults+Extensions.swift"; sourceTree = "<group>"; };
+		7CAFB3F12A8C010800D68F98 /* AuthenticationViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewController.swift; sourceTree = "<group>"; };
+		7CAFB3F32A8C011400D68F98 /* AuthenticationViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationViewModel.swift; sourceTree = "<group>"; };
+		7CAFB3F62A8C0FB200D68F98 /* UsersDataHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsersDataHandler.swift; sourceTree = "<group>"; };
+		7CAFB3FA2A8C621400D68F98 /* RootLauncher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootLauncher.swift; sourceTree = "<group>"; };
 		92442D3A6AA1AA5C3189EB99 /* Pods_MDEV1001_M2023_Firebase.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MDEV1001_M2023_Firebase.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		D34D644D29D3B1207AB093FA /* Pods-MDEV1001-M2023-Firebase.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MDEV1001-M2023-Firebase.debug.xcconfig"; path = "Target Support Files/Pods-MDEV1001-M2023-Firebase/Pods-MDEV1001-M2023-Firebase.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -129,10 +137,10 @@
 			isa = PBXGroup;
 			children = (
 				7C0722412A8B07CE00EBE3D3 /* Launcher */,
+				7CAFB3F02A8C00E300D68F98 /* Authentication */,
 				7C0722442A8B092900EBE3D3 /* Movies */,
 				7CAFB3C42A8B3ADC00D68F98 /* Update */,
 				7CAFB3E72A8B458900D68F98 /* StretchyTableHeaderView */,
-				7C07223F2A8B07A800EBE3D3 /* Data */,
 				7CAFB3CB2A8B3F3B00D68F98 /* Toast */,
 				7CAFB3B92A8B21C400D68F98 /* Extensions */,
 				7C0722402A8B07BF00EBE3D3 /* Utility */,
@@ -169,6 +177,7 @@
 			children = (
 				7C0722292A8AAFB300EBE3D3 /* AppDelegate.swift */,
 				7C07222B2A8AAFB300EBE3D3 /* SceneDelegate.swift */,
+				7CAFB3FA2A8C621400D68F98 /* RootLauncher.swift */,
 			);
 			path = Launcher;
 			sourceTree = "<group>";
@@ -178,6 +187,7 @@
 			children = (
 				7C0722452A8B094100EBE3D3 /* MoviesViewController.swift */,
 				7C0722472A8B094A00EBE3D3 /* MoviesViewModel.swift */,
+				7C07223F2A8B07A800EBE3D3 /* Data */,
 				7CAFB3BC2A8B21FC00D68F98 /* Cell */,
 			);
 			path = Movies;
@@ -269,6 +279,24 @@
 				7CAFB3E82A8B45A800D68F98 /* StretchyTableHeaderView.swift */,
 			);
 			path = StretchyTableHeaderView;
+			sourceTree = "<group>";
+		};
+		7CAFB3F02A8C00E300D68F98 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				7CAFB3F12A8C010800D68F98 /* AuthenticationViewController.swift */,
+				7CAFB3F32A8C011400D68F98 /* AuthenticationViewModel.swift */,
+				7CAFB3F52A8C0FA400D68F98 /* Data */,
+			);
+			path = Authentication;
+			sourceTree = "<group>";
+		};
+		7CAFB3F52A8C0FA400D68F98 /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				7CAFB3F62A8C0FB200D68F98 /* UsersDataHandler.swift */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 		908EC81C486705A32AE8DE31 /* Frameworks */ = {
@@ -401,8 +429,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7CAFB3F42A8C011400D68F98 /* AuthenticationViewModel.swift in Sources */,
+				7CAFB3F72A8C0FB200D68F98 /* UsersDataHandler.swift in Sources */,
 				7CAFB3EB2A8B46B100D68F98 /* UIViewController+Extensions.swift in Sources */,
 				7CAFB3E92A8B45A800D68F98 /* StretchyTableHeaderView.swift in Sources */,
+				7CAFB3F22A8C010800D68F98 /* AuthenticationViewController.swift in Sources */,
 				7CAFB3C22A8B225600D68F98 /* MovieCellViewModel.swift in Sources */,
 				7CAFB3C82A8B3CE400D68F98 /* String+Extensions.swift in Sources */,
 				7CAFB3BF2A8B224400D68F98 /* MovieTableViewCell.swift in Sources */,
@@ -417,6 +448,7 @@
 				7CAFB3DD2A8B413D00D68F98 /* PosterCollectionViewCell.swift in Sources */,
 				7CAFB3E02A8B417700D68F98 /* PosterCellViewModel.swift in Sources */,
 				7C07222C2A8AAFB300EBE3D3 /* SceneDelegate.swift in Sources */,
+				7CAFB3FB2A8C621400D68F98 /* RootLauncher.swift in Sources */,
 				7CAFB3E32A8B42E900D68F98 /* AddEditMovieTableViewCell.swift in Sources */,
 				7C07224A2A8B097E00EBE3D3 /* Protocols.swift in Sources */,
 				7C07224C2A8B099300EBE3D3 /* Constants.swift in Sources */,

@@ -7,8 +7,12 @@
 
 import UIKit
 
-protocol MoviesListener: AnyObject {
+protocol ThemeListener: AnyObject {
     func changeTheme(to style: UIUserInterfaceStyle)
+}
+
+protocol MoviesListener: ThemeListener {
+    func userLoggingOut()
 }
 
 protocol MoviesPresenter: AnyObject {
@@ -23,14 +27,17 @@ protocol MoviesPresenter: AnyObject {
     func scroll(to indexPath: IndexPath)
     func present(_ viewController: UIViewController)
     func push(_ viewController: UIViewController)
+    func dismiss()
 }
 
 protocol MoviesViewModelable {
+    var logoutButtonImage: UIImage? { get }
     var userInterfaceStyle: UIUserInterfaceStyle { get }
     var numberOfMovies: Int { get }
     var presenter: MoviesPresenter? { get set }
     func screenWillAppear()
     func screenLoaded()
+    func logoutButtonTapped()
     func themeButtonTapped()
     func addButtonTapped()
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable?
@@ -39,7 +46,8 @@ protocol MoviesViewModelable {
     func trailingSwipedMovie(at indexPath: IndexPath) -> UISwipeActionsConfiguration
 }
 
-final class MoviesViewModel: MoviesViewModelable {
+final class MoviesViewModel: MoviesViewModelable,
+                             Toastable {
     
     private var movies: [Movie]
     private weak var listener: MoviesListener?
@@ -55,6 +63,10 @@ final class MoviesViewModel: MoviesViewModelable {
 
 // MARK: - Exposed Helpers
 extension MoviesViewModel {
+    
+    var logoutButtonImage: UIImage? {
+        return UIImage(systemName: "arrowshape.turn.up.backward")
+    }
     
     var userInterfaceStyle: UIUserInterfaceStyle {
         return UserDefaults.userInterfaceStyle
@@ -72,11 +84,21 @@ extension MoviesViewModel {
         fetchMovies()
     }
     
+    func logoutButtonTapped() {
+        prepareLogoutAlert { [weak self] in
+            self?.listener?.userLoggingOut()
+            self?.presenter?.dismiss()
+        }
+    }
+    
     func themeButtonTapped() {
         let newStyle = userInterfaceStyle.overridingStyle
         presenter?.setThemeButton(with: newStyle.image)
         listener?.changeTheme(to: newStyle)
-        UserDefaults.appSuite.set(newStyle.rawValue, forKey: UserDefaults.userInterfaceStyleKey)
+        UserDefaults.appSuite.set(
+            newStyle.rawValue,
+            forKey: UserDefaults.userInterfaceStyleKey
+        )
     }
     
     func addButtonTapped() {
@@ -125,12 +147,15 @@ private extension MoviesViewModel {
                 let availablePosters = UserDefaults.appSuite.array(forKey: UserDefaults.availablePostersKey)
                 if availablePosters == nil {
                     let posters = movies.map { $0.poster }.removedDuplicates
-                    UserDefaults.appSuite.set(posters, forKey: UserDefaults.availablePostersKey)
+                    UserDefaults.appSuite.set(
+                        posters,
+                        forKey: UserDefaults.availablePostersKey
+                    )
                 }
                 self?.presenter?.reloadSections(IndexSet(integer: 0))
                 return
             }
-            // TODO: Show error alert
+            self?.showToast(with: error)
         }
     }
     
@@ -145,7 +170,7 @@ private extension MoviesViewModel {
               let documentId = movie.documentId,
               let index = movies.firstIndex(of: movie) else { return }
         let alertTitle = "\(Constants.delete) \"\(movie.title)\"?"
-        prepareDeleteAlert(with: alertTitle, message: Constants.deleteAlertMessage) { [weak self] in
+        prepareDeleteAlert(with: alertTitle) { [weak self] in
             MoviesDataHandler.instance.deleteMovie(at: documentId) { [weak self] error in
                 let indexPath = IndexPath(row: index, section: 0)
                 self?.movies.remove(at: index)
@@ -173,14 +198,45 @@ private extension MoviesViewModel {
         }
     }
     
-    func prepareDeleteAlert(with title: String, message: String, action: @escaping () -> Void) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: Constants.deleteAlertCancelTitle, style: .default)
-        let deleteAction = UIAlertAction(title: Constants.deleteAlertDeleteTitle, style: .destructive) {_ in
+    func prepareDeleteAlert(with title: String, action: @escaping () -> Void) {
+        let alertController = UIAlertController(
+            title: title,
+            message: Constants.deleteAlertMessage,
+            preferredStyle: .alert
+        )
+        let cancelAction = UIAlertAction(
+            title: Constants.alertCancelTitle,
+            style: .default
+        )
+        let deleteAction = UIAlertAction(
+            title: Constants.deleteAlertDeleteTitle,
+            style: .destructive
+        ) {_ in
             action()
         }
         alertController.addAction(cancelAction)
         alertController.addAction(deleteAction)
+        presenter?.present(alertController)
+    }
+    
+    func prepareLogoutAlert(action: @escaping () -> Void) {
+        let alertController = UIAlertController(
+            title: Constants.logoutAlertTitle,
+            message: Constants.logoutAlertMessage,
+            preferredStyle: .alert
+        )
+        let cancelAction = UIAlertAction(
+            title: Constants.alertCancelTitle,
+            style: .default
+        )
+        let logoutAction = UIAlertAction(
+            title: Constants.logoutAlertLogoutTitle,
+            style: .destructive
+        ) {_ in
+            action()
+        }
+        alertController.addAction(cancelAction)
+        alertController.addAction(logoutAction)
         presenter?.present(alertController)
     }
     
@@ -201,7 +257,7 @@ extension MoviesViewModel: AddEditMovieListener {
                 self.scroll(to: indexPath)
                 return
             }
-            // TODO: Show error alert
+            self.showToast(with: error)
         }
     }
 
@@ -219,7 +275,7 @@ extension MoviesViewModel: AddEditMovieListener {
                 }
                 return
             }
-            // TODO: Show error alert
+            self?.showToast(with: error)
         }
     }
     
