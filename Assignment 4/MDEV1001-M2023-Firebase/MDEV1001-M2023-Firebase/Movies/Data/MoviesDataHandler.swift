@@ -52,8 +52,9 @@ extension MoviesDataHandler {
     }
     
     func addMovie(_ movie: Movie, completion: @escaping MovieDefaultCompletion) {
+        guard let documentId = movie.documentId else { return }
         do {
-            try collection.addDocument(from: movie) { error in
+            try collection.document(documentId).setData(from: movie) { error in
                 completion(error?.localizedDescription)
             }
         } catch {

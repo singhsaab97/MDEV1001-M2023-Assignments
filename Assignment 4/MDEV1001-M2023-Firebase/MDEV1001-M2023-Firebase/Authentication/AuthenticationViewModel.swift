@@ -16,6 +16,7 @@ protocol AuthenticationPresenter: AnyObject {
     var userConfirmedEmail: String? { get }
     var userPassword: String? { get }
     var userConfirmedPassword: String? { get }
+    var viewControllersCount: Int { get }
     func startLoading()
     func stopLoading()
     func updateHeadingStackView(isHidden: Bool)
@@ -24,6 +25,7 @@ protocol AuthenticationPresenter: AnyObject {
     func updatePasswordField(_ field: AuthenticationViewModel.Field, isTextHidden: Bool)
     func updateEyeButtonImage(for field: AuthenticationViewModel.Field, with image: UIImage?)
     func clearDetailFields()
+    func activateTextField(_ field: AuthenticationViewModel.Field)
     func push(_ viewController: UIViewController)
     func pop()
     func present(_ viewController: UIViewController)
@@ -33,11 +35,12 @@ protocol AuthenticationViewModelable {
     var flow: AuthenticationViewModel.Flow { get }
     var presenter: AuthenticationPresenter? { get set }
     func screenDidLoad()
+    func screenDidAppear()
     func keyboardWillShow(with frame: CGRect)
     func keyboardWillHide()
     func eyeButtonTapped(with tag: Int)
     func primaryButtonTapped()
-    func messageButtonTapped(with controllersCount: Int)
+    func messageButtonTapped()
 }
 
 final class AuthenticationViewModel: AuthenticationViewModelable,
@@ -78,6 +81,10 @@ extension AuthenticationViewModel {
     func screenDidLoad() {
         setupProtectedFieldsHiddenDict()
         UsersDataHandler.instance.fetchUsers()
+    }
+    
+    func screenDidAppear() {
+        presenter?.activateTextField(flow.activeTextField)
     }
     
     func keyboardWillShow(with frame: CGRect) {
@@ -121,18 +128,8 @@ extension AuthenticationViewModel {
         }
     }
     
-    func messageButtonTapped(with controllersCount: Int) {
-        guard controllersCount > 1 else {
-            // New controller not present in the stack
-            let viewModel = AuthenticationViewModel(flow: flow.nextFlow, listener: listener)
-            let viewController = AuthenticationViewController.loadFromStoryboard()
-            viewController.viewModel = viewModel
-            viewModel.presenter = viewController
-            presenter?.push(viewController)
-            return
-        }
-        // Old controller already present in the stack
-        presenter?.pop()
+    func messageButtonTapped() {
+        showNextFlowScreen()
     }
     
 }
@@ -246,7 +243,26 @@ private extension AuthenticationViewModel {
         }
     }
     
+    func showNextFlowScreen() {
+        guard let controllersCount = presenter?.viewControllersCount,
+              controllersCount > 1 else {
+            // New controller not present in the stack
+            let viewModel = AuthenticationViewModel(flow: flow.nextFlow, listener: listener)
+            let viewController = AuthenticationViewController.loadFromStoryboard()
+            viewController.viewModel = viewModel
+            viewModel.presenter = viewController
+            presenter?.push(viewController)
+            return
+        }
+        // Old controller already present in the stack
+        presenter?.pop()
+    }
+    
     func showMoviesScreen() {
+        // Clear text fields before showing the main screen
+        DispatchQueue.main.asyncAfter(deadline: .now() + Constants.delayDuration) { [weak self] in
+            self?.presenter?.clearDetailFields()
+        }
         let viewController = MoviesViewController.loadFromStoryboard()
         let viewModel = MoviesViewModel(listener: self)
         viewController.viewModel = viewModel
@@ -268,7 +284,12 @@ extension AuthenticationViewModel: MoviesListener {
     }
     
     func userLoggingOut() {
-        presenter?.clearDetailFields()
+        switch flow {
+        case .signUp:
+            showNextFlowScreen()
+        case .signIn:
+            return
+        }
     }
     
 }
@@ -354,11 +375,20 @@ extension AuthenticationViewModel.Flow {
         }
     }
     
+    var activeTextField: AuthenticationViewModel.Field {
+        switch self {
+        case .signUp:
+            return .name
+        case .signIn:
+            return .username
+        }
+    }
+    
 }
 
 // MARK: - AuthenticationViewModel.Field Helpers
 extension AuthenticationViewModel.Field {
-    
+        
     var placeholder: String {
         switch self {
         case .name:

@@ -16,6 +16,7 @@ struct Constants {
     static let headerViewHeight: CGFloat = 250
     static let placeholderFont = UIFont(name: "Helvetica Neue", size: 16)!
     static let animationDuration: TimeInterval = 0.3
+    static let delayDuration: TimeInterval = 0.5
     static let toastDisplayDuration: TimeInterval = 3
     
     static let suiteName = Bundle.main.infoDictionary!["CFBundleName"] as! String

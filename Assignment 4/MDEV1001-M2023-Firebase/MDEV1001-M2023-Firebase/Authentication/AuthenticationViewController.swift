@@ -35,6 +35,11 @@ final class AuthenticationViewController: UIViewController,
         setup()
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        viewModel?.screenDidAppear()
+    }
+    
 }
 
 // MARK: - Private Helpers
@@ -195,7 +200,7 @@ private extension AuthenticationViewController {
     }
     
     @IBAction func messageButtonTapped() {
-        viewModel?.messageButtonTapped(with: navigationController?.viewControllers.count ?? 0)
+        viewModel?.messageButtonTapped()
     }
     
 }
@@ -225,6 +230,10 @@ extension AuthenticationViewController: AuthenticationPresenter {
 
     var userConfirmedPassword: String? {
         return confirmPasswordTextField.text
+    }
+    
+    var viewControllersCount: Int {
+        return navigationController?.viewControllers.count ?? 0
     }
     
     func startLoading() {
@@ -279,6 +288,11 @@ extension AuthenticationViewController: AuthenticationPresenter {
                 textField.becomeFirstResponder()
             }
         }
+    }
+    
+    func activateTextField(_ field: AuthenticationViewModel.Field) {
+        let textField = getTextField(for: field)
+        textField.becomeFirstResponder()
     }
 
     func push(_ viewController: UIViewController) {

@@ -38,7 +38,14 @@ private extension RootLauncher {
     
     func setup() {
         FirebaseApp.configure()
+        setPrimaryColor()
         setUserInterfaceStyle(with: UserDefaults.userInterfaceStyle)
+    }
+    
+    func setPrimaryColor() {
+        UINavigationBar.appearance().tintColor = .systemBlue
+        UIButton.appearance().tintColor = .systemBlue
+        UITextField.appearance().tintColor = .systemBlue
     }
     
     func setUserInterfaceStyle(with style: UIUserInterfaceStyle) {

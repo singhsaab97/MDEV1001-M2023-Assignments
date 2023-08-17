@@ -102,7 +102,10 @@ extension MoviesViewModel {
     }
     
     func addButtonTapped() {
-        showAddEditViewController(for: .add(id: movies.count + 1))
+        showAddEditViewController(for: .add(
+            id: movies.count + 1,
+            documentId: UUID().uuidString
+        ))
     }
     
     func getCellViewModel(at indexPath: IndexPath) -> MovieCellViewModelable? {

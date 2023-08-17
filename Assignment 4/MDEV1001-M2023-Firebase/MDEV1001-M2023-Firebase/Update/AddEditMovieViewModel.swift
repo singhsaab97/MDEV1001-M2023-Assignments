@@ -40,7 +40,7 @@ final class AddEditMovieViewModel: AddEditMovieViewModelable,
                                    Toastable {
     
     enum Mode {
-        case add(id: Int)
+        case add(id: Int, documentId: String)
         case edit(movie: Movie)
     }
     
@@ -173,8 +173,8 @@ private extension AddEditMovieViewModel {
     
     func setup() {
         switch mode {
-        case let .add(id):
-            updatedMovie = Movie.createObject(with: id)
+        case let .add(id, documentId):
+            updatedMovie = Movie.createObject(with: id, documentId: documentId)
         case let .edit(movie):
             updatedMovie = movie
         }

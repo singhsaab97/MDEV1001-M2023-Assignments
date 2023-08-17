@@ -50,9 +50,10 @@ struct Movie: Codable, Equatable {
 // MARK: - Exposed Helpers
 extension Movie {
     
-    static func createObject(with id: Int) -> Movie {
+    static func createObject(with id: Int, documentId: String) -> Movie {
         return Movie(
             id: id,
+            documentId: documentId,
             title: String(),
             studio: String(),
             genres: [],
