@@ -224,7 +224,7 @@ private extension AuthenticationViewModel {
         ) { [weak self] error in
             self?.presenter?.stopLoading()
             guard let error = error else {
-                self?.showMoviesScreen()
+                self?.showNextFlowScreen()
                 return
             }
             self?.showToast(with: error)
